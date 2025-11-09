@@ -1,0 +1,36 @@
+{
+  "Perban": {
+    "type": "heal",
+    "heal": 25
+  },
+  "Herbal": {
+    "type": "heal",
+    "heal": 15
+  },
+  "Painkiller": {
+    "type": "heal",
+    "heal": 35
+  },
+  "Medkit": {
+    "type": "heal",
+    "heal": 50
+  },
+  "Makanan": {
+    "type": "food",
+    "hp": 10,
+    "energy": 30
+  },
+  "Minuman": {
+    "type": "drink",
+    "energy": 20
+  },
+  "Kayu": {
+    "type": "material"
+  },
+  "Batu": {
+    "type": "material"
+  },
+  "Daun": {
+    "type": "material"
+  }
+}
