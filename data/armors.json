@@ -1,0 +1,26 @@
+{
+  "Pakaian Lusuh": {
+    "def": 5
+  },
+  "Kaos": {
+    "def": 8
+  },
+  "Kaos Panjang": {
+    "def": 10
+  },
+  "Sweater": {
+    "def": 14
+  },
+  "Jaket": {
+    "def": 20
+  },
+  "Rompi Lv1": {
+    "def": 30
+  },
+  "Rompi Lv2": {
+    "def": 40
+  },
+  "Rompi Lv3": {
+    "def": 50
+  }
+}
