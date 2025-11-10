@@ -1,14 +1,1 @@
-[
-  {
-    "name": "Natal Apocalypse",
-    "date": "25-12",
-    "description": "🎄 Dunia boleh hancur, tapi semangat Natal tetap hidup!",
-    "rewards": {"Medkit": 2, "Perban": 3}
-  },
-  {
-    "name": "Tahun Baru Survival",
-    "date": "01-01",
-    "description": "💥 Tahun baru, harapan baru di dunia yang hancur!",
-    "rewards": {"Makanan": 2, "Minuman": 2}
-  }
-]
+[]
