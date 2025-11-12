@@ -1,14 +1,5 @@
 [
-  {
-    "name": "Natal Apocalypse",
-    "date": "25-12",
-    "description": "🎄 Dunia boleh hancur, tapi semangat Natal tetap hidup!",
-    "rewards": {"Medkit": 2, "Perban": 3}
-  },
-  {
-    "name": "Tahun Baru Survival",
-    "date": "01-01",
-    "description": "💥 Tahun baru, harapan baru di dunia yang hancur!",
-    "rewards": {"Makanan": 2, "Minuman": 2}
-  }
+  {"date": "01-01", "name": "Tahun Baru", "description": "Hari pertama tahun baru, semangat baru.", "rewards": {"Makanan": 2, "Minuman": 2}},
+  {"date": "17-08", "name": "Hari Kemerdekaan", "description": "Dirgahayu Republik Indonesia!", "rewards": {"Ammo 9mm": 10, "Painkiller": 1}},
+  {"date": "25-12", "name": "Natal Survival", "description": "Natal di tengah dunia yang hancur.", "rewards": {"Medkit": 1, "Makanan": 2}}
 ]
