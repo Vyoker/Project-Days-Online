@@ -1,5 +1,26 @@
 [
-  {"date": "01-01", "name": "Tahun Baru", "description": "Hari pertama tahun baru, semangat baru.", "rewards": {"Makanan": 2, "Minuman": 2}},
-  {"date": "17-08", "name": "Hari Kemerdekaan", "description": "Dirgahayu Republik Indonesia!", "rewards": {"Ammo 9mm": 10, "Painkiller": 1}},
-  {"date": "25-12", "name": "Natal Survival", "description": "Natal di tengah dunia yang hancur.", "rewards": {"Medkit": 1, "Makanan": 2}}
+  {
+    "date": "01-01",
+    "name": "Tahun Baru",
+    "description": "Perayaan Tahun Baru, distribusi bantuan.",
+    "rewards": {"Makanan": 2, "Minuman": 2}
+  },
+  {
+    "date": "17-08",
+    "name": "Hari Kemerdekaan",
+    "description": "Dirgahayu Republik Indonesia.",
+    "rewards": {"Ammo 9mm": 10, "Painkiller": 1}
+  },
+  {
+    "date": "25-12",
+    "name": "Natal Survival",
+    "description": "Natal di tengah dunia yang hancur.",
+    "rewards": {"Medkit": 1, "Makanan": 2}
+  },
+  {
+    "date": "31-10",
+    "name": "Halloween Survival",
+    "description": "Malam di mana mayat hidup lebih agresif. Para penyintas menyalakan api unggun dan berbagi cerita untuk bertahan hingga fajar.",
+    "rewards": {"Makanan": 2, "Minuman": 2, "Painkiller": 1, "Ammo 9mm": 10}
+  }
 ]
