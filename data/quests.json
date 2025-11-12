@@ -1,0 +1,38 @@
+{
+  "main": {
+    "001": {
+      "name": "Awal Kegelapan",
+      "desc": "Temukan tempat aman di pinggiran kota setelah wabah melanda.",
+      "requirements": {"location": "Hutan Pinggiran"},
+      "rewards": {"EXP": 150, "items": {"Perban": 2, "Makanan": 1}},
+      "next": "002"
+    },
+    "002": {
+      "name": "Jejak Peneliti",
+      "desc": "Temukan catatan eksperimen di kota Bandung.",
+      "requirements": {"location": "Bandung"},
+      "rewards": {"EXP": 200, "items": {"Painkiller": 1}},
+      "next": "003"
+    },
+    "003": {
+      "name": "Sinyal Terakhir",
+      "desc": "Temukan sinyal radio misterius dari Yogyakarta.",
+      "requirements": {"location": "Yogyakarta"},
+      "rewards": {"EXP": 300, "items": {"Medkit": 1}}
+    }
+  },
+  "side": {
+    "S001": {
+      "name": "Bantu Pedagang",
+      "desc": "Kumpulkan 5x Kayu untuk pedagang di Bandung.",
+      "requirements": {"items": {"Kayu": 5}},
+      "rewards": {"EXP": 100, "items": {"Minuman": 1}}
+    },
+    "S002": {
+      "name": "Tolong Peneliti",
+      "desc": "Bawa Painkiller ke peneliti di Yogyakarta.",
+      "requirements": {"items": {"Painkiller": 1}},
+      "rewards": {"EXP": 150, "items": {"Ammo 9mm": 10}}
+    }
+  }
+}
