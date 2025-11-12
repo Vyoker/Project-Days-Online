@@ -1,7 +1,13 @@
-# Project Days Online
-"Game yang bertema survival dengan gaya based text CLI - Termux. Pada tahun 2089, dunia mengalami kehancuran yang disebabkan oleh senjata biologis, menyebabkan orang-orang mati terkena virus misterius. Berlatar tempat di indonesia, temukan tempat yang aman, bertukar informasi ataupun barang dengan survivor lain, dan bertahan hiduplah."
-# Cara Instal
-- download installer_projectdays.sh
-- ikuti intruksi yang ada di script
-- jika ingin mode online siapkan beberapa tahap
-- hubungi admin / GM apabila mengalami kesulitan
+🔥 Cara install Project Days Online di Termux 🔥
+===========================================
+1️⃣ Buka Termux  
+2️⃣ Ketik perintah di bawah ini:
+📂 Untuk Installer:
+bash <(curl -sL https://raw.githubusercontent.com/Vyoker/Project-Days-Online/main/installer_projectdays.sh)
+
+📂 Untuk Update game terbaru:
+bash <(curl -sL https://raw.githubusercontent.com/Vyoker/Project-Days-Online/main/update_projectdays.sh)
+
+3️⃣ Tunggu instalasi selesai  
+4️⃣ Jalankan game:
+cd ~/Project_Days && python3 Project_Days_Online.py
