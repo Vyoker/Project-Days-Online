@@ -1,0 +1,14 @@
+{
+  "intro": [
+    {"speaker": "Narator", "text": "Tahun 2089. Indonesia hancur akibat proyek rahasia yang bocor."},
+    {"speaker": "Pemerintah", "text": "Seluruh warga diimbau tetap di rumah. Virus tidak bisa dihentikan..."},
+    {"speaker": "Pemain", "text": "Aku harus bertahan hidup... dan mencari kebenaran."}
+  ],
+  "npc_bandung": [
+    {"speaker": "Pedagang", "text": "Kau terlihat lelah. Barang-barangku mungkin bisa membantumu."},
+    {"speaker": "Pemain", "text": "Aku hanya ingin bertahan, bukan berbisnis."}
+  ],
+  "npc_yogyakarta": [
+    {"speaker": "Peneliti", "text": "Virus ini bukan alami... Ada tangan manusia di balik semua ini."}
+  ]
+}
