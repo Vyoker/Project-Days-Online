@@ -890,7 +890,7 @@ def crafting_menu(player):
 def travel_menu(player):
     clear()
     console.print(Panel(Text("🚗  TRAVEL MENU", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
-    console.print(f"\n📍 Lokasi saat ini : {player['location']}\n⚡ Energi         : {player['ENERGY']}/{player['MAX_ENERGY']}\n")
+    console.print(f"\n📍 Lokasi saat ini : {player['location']}\n⚡ Energi         : {player['energy']}/{player['max_energy']}\n")
     konfirmasi = input("Ingin melakukan perjalanan ke kota lain? (y/n): ").strip().lower()
     if konfirmasi != "y":
         slow("Perjalanan dibatalkan.", 0.02)
@@ -1003,11 +1003,11 @@ def explore_menu(player):
         console.print("\n1. Hutan\n2. Desa\n3. Kota\n4. Kembali\n")
         choice = input("Pilih lokasi: ").strip()
         if choice == "1":
-            lokasi = "Hutan"; energi = 15; chance_zombie = 30; chance_item = 80; reward_exp = 10
+            lokasi = "Hutan"; energi = 5; chance_zombie = 30; chance_item = 80; reward_exp = 10
         elif choice == "2":
-            lokasi = "Desa"; energi = 25; chance_zombie = 70; chance_item = 80; reward_exp = 20
+            lokasi = "Desa"; energi = 15; chance_zombie = 70; chance_item = 80; reward_exp = 20
         elif choice == "3":
-            lokasi = "Kota"; energi = 50; chance_zombie = 90; chance_item = 80; reward_exp = 40
+            lokasi = "Kota"; energi = 25; chance_zombie = 90; chance_item = 80; reward_exp = 40
         elif choice == "4":
             return
         else:
@@ -1127,12 +1127,12 @@ def battle_zombie(player, lokasi, reward_exp):
             continue
         # zombie attack
         if zombie["hp"] > 0:
-            if random.randint(1,100) <= player.get("DEX",0):
+            if random.randint(1,100) <= player.get("dex",0):
                 slow("Kamu berhasil menghindar serangan!", 0.02)
             else:
                 base_dmg_zombie = zombie["atk"]
                 # DEF reduces percentage: 1.5% per DEF point of incoming damage
-                def_reduction = base_dmg_zombie * (player.get("DEF",0) * 0.015)
+                def_reduction = base_dmg_zombie * (player.get("def",0) * 0.015)
                 total_zombie_dmg = max(1, int(base_dmg_zombie - def_reduction))
                 player["hp"] -= total_zombie_dmg
                 slow(f"{zombie['name']} menyerangmu dan memberi {total_zombie_dmg} damage!", 0.02)
@@ -1140,7 +1140,7 @@ def battle_zombie(player, lokasi, reward_exp):
         if zombie["hp"] <= 0:
             slow(f"\n{zombie['name']} dikalahkan!", 0.03)
             gained_exp = zombie["exp"]
-            player["EXP"] += gained_exp
+            player["exp"] += gained_exp
             slow(f"Kamu mendapat {gained_exp} EXP!", 0.02)
             drop_item(player)
             check_level_up(player)
@@ -1229,7 +1229,7 @@ def chat_menu(player):
                     target_uuid = parts[0].strip()
                     item = parts[1].strip()
                     qty = int(parts[2]) if len(parts) >=3 else 1
-                    ok, info = append_event(target_uuid, item, qty, sender=player.get("NAME"))
+                    ok, info = append_event(target_uuid, item, qty, sender=player.get("name"))
                     if ok:
                         slow(f"✅ Event dikirim ke {target_uuid}: {qty}x {item}", 0.02)
                     else:
