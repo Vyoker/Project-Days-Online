@@ -1,4 +1,4 @@
-# Project_Days_Online v2.5
+# Project_Days_Online v3.0
 # Save as: Project_Days_Online.py
 # Requires: pip install requests rich
 
@@ -519,18 +519,18 @@ def create_new_game():
         name = "Survivor"
     player_uuid = str(uuid.uuid4())
     player = {
-        "NAME": name,
+        "name": name,
         "UUID": player_uuid,
         "Level": 1,
-        "EXP": 0,
-        "EXP_TO_NEXT": 100,
-        "HP": 100,
-        "MAX_HP": 100,
-        "ENERGY": 100,
-        "MAX_ENERGY": 100,
-        "ATK": 10,
-        "DEF": 5,
-        "DEX": 3,
+        "exp": 0,
+        "exp_tp_next": 100,
+        "hp": 100,
+        "max_hp": 100,
+        "energy": 100,
+        "max_energy": 100,
+        "atk": 10,
+        "def": 5,
+        "dex": 3,
         "Weapon": "Tangan Kosong",
         "Armor": "Pakaian Lusuh",
         "inventory": {
@@ -687,7 +687,7 @@ def main_menu(player):
 def inventory_menu(player):
     while True:
         clear()
-        console.print(Panel(Text(f"📦 INVENTORY — {player.get('NAME','Survivor')}", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
+        console.print(Panel(Text(f"📦 INVENTORY — {player.get('name','Survivor')}", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
         if not player.get("inventory"):
             console.print("Inventory kosong.\n", style=HIGHLIGHT)
         else:
@@ -799,17 +799,17 @@ def gunakan_item(player):
         t = item_def.get("type")
         if t == "heal":
             heal = item_def.get("heal", 0)
-            player["hp"] = min(player["MAX_HP"], player["hp"] + heal)
+            player["hp"] = min(player["max_hp"], player["hp"] + heal)
             slow(f"Kamu menggunakan {item}. HP +{heal}", 0.01)
         elif t == "drink":
             energy = item_def.get("energy", 0)
-            player["energy"] = min(player["MAX_ENERGY"], player["energy"] + energy)
+            player["energy"] = min(player["max_energy"], player["energy"] + energy)
             slow(f"Kamu menggunakan {item}. Energy +{energy}", 0.01)
         elif t == "food":
             heal = item_def.get("hp", 0)
             energy = item_def.get("energy", 0)
-            player["hp"] = min(player["MAX_HP"], player["hp"] + heal)
-            player["energy"] = min(player["MAX_ENERGY"], player["energy"] + energy)
+            player["hp"] = min(player["max_hp"], player["hp"] + heal)
+            player["energy"] = min(player["max_energy"], player["energy"] + energy)
             slow(f"Kamu menggunakan {item}. HP +{heal}, Energy +{energy}", 0.01)
         else:
             slow("Item ini tidak bisa digunakan langsung.", 0.01)
