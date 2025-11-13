@@ -11,7 +11,7 @@ console = Console()
 # --- CONFIG ---
 GAME_DIR = os.path.expanduser("~") + "/Project_Days"
 DATA_DIR = os.path.join(GAME_DIR, "data")
-FIREBASE_URL = "https://your-firebase-app.firebaseio.com"  # <-- REPLACE with your Firebase Realtime Database URL (no trailing slash)
+FIREBASE_URL = "https://project-days-online-default-rtdb.asia-southeast1.firebasedatabase.app"  # <-- REPLACE with your Firebase Realtime Database URL (no trailing slash)
 ADMIN_KEY_FILE = os.path.join(GAME_DIR, "admin_key.txt")
 ADMIN_KEY = "VYOKER-GM-11022025"  # default master key (installer_admin will write to admin_key.txt)
 
