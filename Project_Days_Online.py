@@ -687,7 +687,7 @@ def main_menu(player):
 def inventory_menu(player):
     while True:
         clear()
-        console.print(Panel(Text(f"📦 INVENTORY — {player.get('NAME','Survivor')}", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
+        console.print(Panel(Text(f"📦 INVENTORY — {player.get('name','Survivor')}", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
         if not player.get("inventory"):
             console.print("Inventory kosong.\n", style=HIGHLIGHT)
         else:
@@ -803,13 +803,13 @@ def gunakan_item(player):
             slow(f"Kamu menggunakan {item}. HP +{heal}", 0.01)
         elif t == "drink":
             energy = item_def.get("energy", 0)
-            player["energy"] = min(player["MAX_ENERGY"], player["energy"] + energy)
+            player["energy"] = min(player["max_energy"], player["energy"] + energy)
             slow(f"Kamu menggunakan {item}. Energy +{energy}", 0.01)
         elif t == "food":
             heal = item_def.get("hp", 0)
             energy = item_def.get("energy", 0)
-            player["hp"] = min(player["MAX_HP"], player["hp"] + heal)
-            player["energy"] = min(player["MAX_ENERGY"], player["energy"] + energy)
+            player["hp"] = min(player["max_hp"], player["hp"] + heal)
+            player["energy"] = min(player["max_energy"], player["energy"] + energy)
             slow(f"Kamu menggunakan {item}. HP +{heal}, Energy +{energy}", 0.01)
         else:
             slow("Item ini tidak bisa digunakan langsung.", 0.01)
@@ -1003,11 +1003,11 @@ def explore_menu(player):
         console.print("\n1. Hutan\n2. Desa\n3. Kota\n4. Kembali\n")
         choice = input("Pilih lokasi: ").strip()
         if choice == "1":
-            lokasi = "Hutan"; energi = 15; chance_zombie = 30; chance_item = 80; reward_exp = 10
+            lokasi = "Hutan"; energi = 7; chance_zombie = 30; chance_item = 80; reward_exp = 10
         elif choice == "2":
-            lokasi = "Desa"; energi = 25; chance_zombie = 70; chance_item = 80; reward_exp = 20
+            lokasi = "Desa"; energi = 15; chance_zombie = 70; chance_item = 80; reward_exp = 20
         elif choice == "3":
-            lokasi = "Kota"; energi = 50; chance_zombie = 90; chance_item = 80; reward_exp = 40
+            lokasi = "Kota"; energi = 25; chance_zombie = 90; chance_item = 80; reward_exp = 40
         elif choice == "4":
             return
         else:
@@ -1127,12 +1127,12 @@ def battle_zombie(player, lokasi, reward_exp):
             continue
         # zombie attack
         if zombie["hp"] > 0:
-            if random.randint(1,100) <= player.get("DEX",0):
+            if random.randint(1,100) <= player.get("dex",0):
                 slow("Kamu berhasil menghindar serangan!", 0.02)
             else:
                 base_dmg_zombie = zombie["atk"]
                 # DEF reduces percentage: 1.5% per DEF point of incoming damage
-                def_reduction = base_dmg_zombie * (player.get("DEF",0) * 0.015)
+                def_reduction = base_dmg_zombie * (player.get("def",0) * 0.015)
                 total_zombie_dmg = max(1, int(base_dmg_zombie - def_reduction))
                 player["hp"] -= total_zombie_dmg
                 slow(f"{zombie['name']} menyerangmu dan memberi {total_zombie_dmg} damage!", 0.02)
@@ -1140,7 +1140,7 @@ def battle_zombie(player, lokasi, reward_exp):
         if zombie["hp"] <= 0:
             slow(f"\n{zombie['name']} dikalahkan!", 0.03)
             gained_exp = zombie["exp"]
-            player["EXP"] += gained_exp
+            player["exp"] += gained_exp
             slow(f"Kamu mendapat {gained_exp} EXP!", 0.02)
             drop_item(player)
             check_level_up(player)
