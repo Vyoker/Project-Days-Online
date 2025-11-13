@@ -1,5 +1,4 @@
-# Project_Days_Online v2.5
-# Save as: Project_Days_Online.py
+# Project_Days_Online v2.6
 # Requires: pip install requests rich
 
 import os, sys, time, random, json, base64, uuid, requests
@@ -11,7 +10,6 @@ from rich.table import Table
 from rich.align import Align
 
 console = Console()
-
 # ---------------------------
 # UI / Colors / Folders
 # ---------------------------
@@ -43,12 +41,10 @@ def loading_animation(message="Loading", duration=1.2, speed=0.25):
     i = 0
     while time.time() < end:
         dots = "." * ((i % 3) + 1)
-        # Use a single-line print with carriage return suppressed by console.print end param not supported,
-        # so we just print simple panels quickly then clear by short sleep.
+        
         console.print(Panel(f"[{HIGHLIGHT}]{message}[/]{dots}", style=ACCENT, box=box.ROUNDED))
         time.sleep(speed)
         i += 1
-
 # ---------------------------
 # Default data (used if JSON missing or corrupt)
 # ---------------------------
@@ -133,7 +129,6 @@ DEFAULT_DESCRIPTIONS = {
     "Rompi Lv3": {"desc": "Rompi militer tingkat tinggi.", "def": 50}
   }
 }
-
 # ---------------------------
 # JSON loader / saver (hybrid)
 # ---------------------------
@@ -147,7 +142,6 @@ def load_json(filename, default):
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
     except Exception as e:
-        # fallback: rewrite with default to avoid persistent corruption
         try:
             with open(path, "w", encoding="utf-8") as f:
                 json.dump(default, f, indent=2, ensure_ascii=False)
@@ -159,7 +153,6 @@ def save_json(filename, data):
     path = os.path.join(DATA_PATH, filename)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
-
 # load data sets (hybrid)
 ITEMS = load_json("items.json", DEFAULT_ITEMS)
 WEAPONS = load_json("weapons.json", DEFAULT_WEAPONS)
@@ -167,7 +160,6 @@ ARMORS = load_json("armors.json", DEFAULT_ARMORS)
 MONSTERS = load_json("monsters.json", DEFAULT_MONSTERS)
 EVENTS = load_json("events.json", DEFAULT_EVENTS)
 DESCRIPTIONS = load_json("descriptions.json", DEFAULT_DESCRIPTIONS)
-
 # ---------------------------
 # GitHub backend helpers (online)
 # ---------------------------
@@ -325,7 +317,7 @@ def fetch_and_claim_events_for_player(player):
     deliver = []
     remaining = []
     for e in existing:
-        if e.get("to") == player.get("UUID") or e.get("to") == "global":
+        if e.get("to") == player.get("uuid") or e.get("to") == "global":
             deliver.append(e)
         else:
             remaining.append(e)
@@ -349,7 +341,7 @@ def append_event(to_uuid, item, qty=1, sender="SYSTEM"):
 MAX_CHAT_SIZE_KB = 500
 
 def send_chat_message(player, msg):
-    banned, ban_entry = is_banned(player.get("UUID"))
+    banned, ban_entry = is_banned(player.get("uuid"))
     if banned:
         until_t = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(ban_entry.get("until", 0)))
         return False, f"Kamu diblokir sampai {until_t}."
@@ -367,7 +359,7 @@ def send_chat_message(player, msg):
         except:
             pass
         existing = [sys_msg]
-    new_entry = {"user": player.get("NAME","Survivor"), "msg": str(msg), "time": time.strftime("%H:%M:%S"), "loc": player.get("location",""), "uuid": player.get("UUID")}
+    new_entry = {"user": player.get("name","Survivor"), "msg": str(msg), "time": time.strftime("%H:%M:%S"), "loc": player.get("location",""), "uuid": player.get("uuid")}
     ok, info = safe_append_and_put(CHAT_PATH, new_entry)
     return ok, info
 
@@ -380,7 +372,7 @@ def show_chat_preview(limit=20):
 # Market
 # ---------------------------
 def post_market_item(player, item_name, qty=1):
-    new_entry = {"seller": player.get("NAME","Survivor"), "item": item_name, "qty": int(qty), "time": time.strftime("%H:%M:%S"), "loc": player.get("location","")}
+    new_entry = {"seller": player.get("name","Survivor"), "item": item_name, "qty": int(qty), "time": time.strftime("%H:%M:%S"), "loc": player.get("location","")}
     ok, info = safe_append_and_put(MARKET_PATH, new_entry)
     return ok, info
 
@@ -519,20 +511,20 @@ def create_new_game():
         name = "Survivor"
     player_uuid = str(uuid.uuid4())
     player = {
-        "NAME": name,
-        "UUID": player_uuid,
-        "Level": 1,
-        "EXP": 0,
-        "EXP_TO_NEXT": 100,
-        "HP": 100,
-        "MAX_HP": 100,
-        "ENERGY": 100,
-        "MAX_ENERGY": 100,
-        "ATK": 10,
-        "DEF": 5,
-        "DEX": 3,
-        "Weapon": "Tangan Kosong",
-        "Armor": "Pakaian Lusuh",
+        "name": name,
+        "uuid": player_uuid,
+        "level": 1,
+        "exp": 0,
+        "exp_to_next": 100,
+        "hp": 100,
+        "max_hp": 100,
+        "energy": 100,
+        "max_energy": 100,
+        "atk": 10,
+        "def": 5,
+        "dex": 3,
+        "weapon": "Tangan Kosong",
+        "armor": "Pakaian Lusuh",
         "inventory": {
             "Perban": 2, "Minuman": 2, "Makanan": 1,
             "Ammo 9mm": 10, "Ammo 12mm": 2, "Ammo 7.2mm": 1,
@@ -565,7 +557,7 @@ def create_new_game():
 def check_level_up(player):
     while player.get('exp', 0) >= player.get('exp_to_next', 100):
         player['exp'] -= player['exp_to_next']
-        player['Level'] += 1
+        player['level'] += 1
         player['exp_to_next'] = player.get('exp_to_next',100) + 50
         player['atk'] += 2
         player['def'] += 1
@@ -574,7 +566,7 @@ def check_level_up(player):
         player['max_energy'] += 5
         player['hp'] = player['max_hp']
         player['energy'] = player['max_energy']
-        slow(f"\n🎉 Naik level! Sekarang kamu level {player['Level']}", 0.02)
+        slow(f"\n🎉 Naik level! Sekarang kamu level {player['level']}", 0.02)
         time.sleep(0.8)
 # ---------------------------
 # UI / Menus
@@ -612,13 +604,13 @@ def tampil_status(player):
     table = Table.grid(expand=True)
     table.add_column(ratio=2)
     table.add_column(ratio=3)
-    stats = (f"🔰 Level: {player.get('Level',1)}  | EXP: {player.get('exp',0)}/{player.get('exp_to_next',100)}\n"
+    stats = (f"🔰 Level: {player.get('level',1)}  | EXP: {player.get('exp',0)}/{player.get('exp_to_next',100)}\n"
              f"❤️ HP: {player.get('hp',100)}/{player.get('max_hp',100)}  | ⚡ Energy: {player.get('energy',100)}/{player.get('max_energy',100)}\n"
              f"🗡️ ATK: {player.get('atk',10)}  | 🛡️ DEF: {player.get('def',5)}  | 🎯 DEX: {player.get('dex',3)}")
     table.add_row(Panel(Text(f"🧍  Nama: {player.get('name','Survivor')}", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG),
                   Panel(Text(stats, style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
     console.print(table)
-    console.print(Panel(Text(f"⚙️ Weapon: {player.get('Weapon','Tangan Kosong')}    🧥 Armor: {player.get('Armor','Pakaian Lusuh')}", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
+    console.print(Panel(Text(f"⚙️ Weapon: {player.get('weapon','Tangan Kosong')}    🧥 Armor: {player.get('armor','Pakaian Lusuh')}", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
 
 def check_event(player):
     import requests, datetime, json
@@ -799,7 +791,7 @@ def gunakan_item(player):
         t = item_def.get("type")
         if t == "heal":
             heal = item_def.get("heal", 0)
-            player["hp"] = min(player["MAX_HP"], player["hp"] + heal)
+            player["hp"] = min(player["max_hp"], player["hp"] + heal)
             slow(f"Kamu menggunakan {item}. HP +{heal}", 0.01)
         elif t == "drink":
             energy = item_def.get("energy", 0)
@@ -890,7 +882,7 @@ def crafting_menu(player):
 def travel_menu(player):
     clear()
     console.print(Panel(Text("🚗  TRAVEL MENU", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
-    console.print(f"\n📍 Lokasi saat ini : {player['location']}\n⚡ Energi         : {player['ENERGY']}/{player['MAX_ENERGY']}\n")
+    console.print(f"\n📍 Lokasi saat ini : {player['location']}\n⚡ Energi         : {player['energy']}/{player['max_energy']}\n")
     konfirmasi = input("Ingin melakukan perjalanan ke kota lain? (y/n): ").strip().lower()
     if konfirmasi != "y":
         slow("Perjalanan dibatalkan.", 0.02)
@@ -1097,7 +1089,7 @@ def battle_zombie(player, lokasi, reward_exp):
             weapon_data = WEAPONS.get(weapon_name, {"type":"melee","atk":5})
             base_atk_w = weapon_data.get("atk",5)
             # atk increase per ATK stat: +2% per point
-            atk_bonus = base_atk_w * (player.get("ATK",10) * 0.02)
+            atk_bonus = base_atk_w * (player.get("atk",10) * 0.02)
             total_damage = int(base_atk_w + atk_bonus)
             if weapon_data.get("type") == "gun":
                 ammo_type = weapon_data.get("ammo")
@@ -1192,7 +1184,7 @@ def chat_menu(player):
                 admin_uuid_local = open(ADMIN_FILE,"r", encoding="utf-8").read().strip()
             except:
                 admin_uuid_local = None
-        is_admin = (player.get("UUID") == admin_uuid_local)
+        is_admin = (player.get("uuid") == admin_uuid_local)
         if msg.startswith("/ban") and is_admin:
             parts = msg.split()
             if len(parts) >= 2:
@@ -1209,7 +1201,7 @@ def chat_menu(player):
                 else:
                     slow(f"⚠️ Gagal menambahkan ban: {info}", 0.02)
             else:
-                slow("Gunakan: /ban <UUID> [minutes]", 0.02)
+                slow("Gunakan: /ban <uuid> [minutes]", 0.02)
             time.sleep(0.6)
             display_chats()
             continue
@@ -1229,7 +1221,7 @@ def chat_menu(player):
                     target_uuid = parts[0].strip()
                     item = parts[1].strip()
                     qty = int(parts[2]) if len(parts) >=3 else 1
-                    ok, info = append_event(target_uuid, item, qty, sender=player.get("NAME"))
+                    ok, info = append_event(target_uuid, item, qty, sender=player.get("name"))
                     if ok:
                         slow(f"✅ Event dikirim ke {target_uuid}: {qty}x {item}", 0.02)
                     else:
