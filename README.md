@@ -3,7 +3,7 @@
 1️⃣ Buka Termux  
 2️⃣ Ketik perintah di bawah ini:
 📂 Untuk Installer:
-bash <(curl -sL https://raw.githubusercontent.com/Vyoker/Project-Days-Online/main/installer_projectdays.sh)
+bash <(curl -sL https://raw.githubusercontent.com/Vyoker/Project-Days-Online/main/installer_player.sh)
 
 📂 Untuk Update game terbaru:
 bash <(curl -sL https://raw.githubusercontent.com/Vyoker/Project-Days-Online/main/update_projectdays.sh)
