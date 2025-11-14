@@ -12,6 +12,12 @@
     "rewards": {"Ammo 9mm": 10, "Painkiller": 1}
   },
   {
+    "date": "01-12",
+    "name": "Hari Istri",
+    "description": "Selamat ulang tahun istriku.",
+    "reward": {"Medkit": 1, "Makanan": 10, "Minuman": 10, "Bolu": 1, "Pisau": 1}
+  },
+  {
     "date": "25-12",
     "name": "Natal Survival",
     "description": "Natal di tengah dunia yang hancur.",
