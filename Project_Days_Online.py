@@ -813,10 +813,10 @@ def gunakan_item(player):
             if player["inventory"].get(ammo_t, 0) <= 0:
                 slow(f"Kamu tidak punya peluru {ammo_t}! Tidak bisa equip {item}.", 0.01)
                 return
-        player["Weapon"] = item
+        player["weapon"] = item
         slow(f"Kamu kini menggunakan senjata: {item}!", 0.01)
     elif item in ARMORS:
-        player["Armor"] = item
+        player["armor"] = item
         slow(f"Kamu kini memakai armor: {item}!", 0.01)
     else:
         slow("Item ini tidak bisa digunakan langsung.", 0.01)
