@@ -1049,7 +1049,7 @@ def explore_menu(player):
         event_roll = random.randint(1, 100)
         # item chance prioritized, else zombie chance
         if event_roll <= chance_item:
-            dapat_item(player, lokasi)
+            dapat_item(player, lokasi, reward_exp)
         elif event_roll <= chance_item + chance_zombie:
             battle_zombie(player, lokasi, reward_exp)
         else:
