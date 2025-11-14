@@ -1435,7 +1435,7 @@ def drop_item(player):
 def chat_menu(player):
     clear()
     slow("📻 RADIO SURVIVOR — Chat Global (Ketik /exit untuk keluar)\n", 0.01)
-    slow("Perintah admin: /ban  /event  (hanya admin)\n", 0.01)
+    slow("Perintah admin: /ban  /gift  (hanya admin)\n", 0.01)
 
     def display_chats():
         chats = show_chat_preview(limit=20)
@@ -1447,7 +1447,7 @@ def chat_menu(player):
             loc = c.get('loc','-')
             msg = c.get('msg','')
             slow(f"[{time_s}] [{loc}] {user}: {msg}", 0.005)
-        slow("\nKetik pesan. /exit untuk keluar. Admin: /ban, /event", 0.005)
+        slow("\nKetik pesan. /exit untuk keluar.", 0.005)
     # tampil awal
     display_chats()
     while True:
