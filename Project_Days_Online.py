@@ -1,4 +1,4 @@
-# Project_Days_Online v2.6.4
+# Project_Days_Online v2.6.5
 # Requires: pip install requests rich
 
 import os, sys, time, random, json, base64, uuid, requests
@@ -372,16 +372,262 @@ def show_chat_preview(limit=20):
 # ---------------------------
 # Market
 # ---------------------------
-def post_market_item(player, item_name, qty=1):
-    new_entry = {"seller": player.get("name","Survivor"), "item": item_name, "qty": int(qty), "time": time.strftime("%H:%M:%S"), "loc": player.get("location","")}
-    ok, info = safe_append_and_put(MARKET_PATH, new_entry)
-    return ok, info
+def _load_market_local():
+    # baca market lokal di data/market.json (dibuat jika belum ada)
+    return load_json("market.json", [])
 
-def fetch_market(limit=20):
-    data, status = fetch_json_raw(MARKET_PATH)
-    if status != 200:
-        return []
-    return data[-limit:]
+def _save_market_local(data):
+    save_json("market.json", data)
+
+def _push_market_to_github(market_list):
+    """
+    Jika ONLINE_MODE aktif, push market_list ke repo (overwrite market.json).
+    Jika gagal atau offline, tetap simpan lokal.
+    """
+    try:
+        # dapatkan sha terlebih dahulu agar _put_file dapat update
+        _, sha, status = _get_file_and_sha(MARKET_PATH)
+        resp, code_or_err = _put_file(MARKET_PATH, market_list, sha=sha, commit_msg="Update marketplace (Project Days)")
+        if resp is None or getattr(resp, "status_code", None) not in (200, 201):
+            return False, f"GitHub update failed: {code_or_err}"
+        return True, "ok"
+    except Exception as e:
+        return False, str(e)
+
+def market_refresh():
+    """
+    Ambil listing market. Jika online, coba fetch dari raw github,
+    fallback ke local file data/market.json.
+    """
+    # coba ambil remote dulu
+    remote, status = fetch_json_raw(MARKET_PATH)
+    if status == 200 and isinstance(remote, list):
+        # sinkronkan juga ke local agar offline nanti up-to-date
+        _save_market_local(remote)
+        return remote
+    # fallback ke local
+    local = _load_market_local()
+    return local
+
+def _list_all_valid_item_names():
+    # gabungkan semua nama item/senjata/armor untuk tampilan pilihan saat sell
+    names = set()
+    names.update(list(ITEMS.keys()))
+    names.update(list(WEAPONS.keys()))
+    names.update(list(ARMORS.keys()))
+    return sorted(names)
+
+def market_sell(player):
+    """
+    Flow:
+      - tampilkan semua nama item
+      - input: offer item (nama exact)
+      - input: offer_qty (int >0)
+      - input: want item (nama exact)
+      - input: want_qty (int >0)
+      - cek player punya offer_qty, hapus dari inventory, post listing (local + github jika online)
+    """
+    clear()
+    console.print(Panel(Text("⚒️  MARKET — SELL (barter)", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
+    names = _list_all_valid_item_names()
+    console.print("Daftar item (ketik nama persis):\n")
+    # tampilkan dalam baris-baris ringkas
+    per_line = 4
+    for i in range(0, len(names), per_line):
+        console.print("  ".join(names[i:i+per_line]))
+    console.print()
+    offer = input("Nama item yang kamu TAWARKAN (ketik exact nama): ").strip()
+    if not offer or offer not in names:
+        slow("❌ Nama item tidak valid.", 0.02); time.sleep(0.6); return
+    try:
+        offer_qty = int(input("Kuantiti yang kamu tawarkan (angka): ").strip())
+        if offer_qty < 1:
+            raise ValueError
+    except Exception:
+        slow("❌ Kuantiti tidak valid.", 0.02); time.sleep(0.6); return
+    # cek punya item cukup
+    if player["inventory"].get(offer, 0) < offer_qty:
+        slow(f"❌ Kamu tidak punya {offer_qty}x {offer}.", 0.02); time.sleep(0.6); return
+
+    want = input("Nama item yang kamu INGINKAN (ketik exact nama): ").strip()
+    if not want or want not in names:
+        slow("❌ Nama item yang diinginkan tidak valid.", 0.02); time.sleep(0.6); return
+    try:
+        want_qty = int(input("Kuantiti yang kamu inginkan (angka): ").strip())
+        if want_qty < 1:
+            raise ValueError
+    except Exception:
+        slow("❌ Kuantiti tidak valid.", 0.02); time.sleep(0.6); return
+
+    # konfirmasi (opsional singkat)
+    slow(f"\nPosting listing: {player.get('name')} menawarkan {offer_qty}x {offer} ⇒ {want_qty}x {want}", 0.01)
+    confirm = input("Ketik 'y' untuk konfirmasi: ").strip().lower()
+    if confirm != "y":
+        slow("Dibatalkan.", 0.02); time.sleep(0.6); return
+
+    # kurangi inventory player
+    player["inventory"][offer] -= offer_qty
+    if player["inventory"][offer] <= 0:
+        del player["inventory"][offer]
+
+    entry = {
+        "seller": player.get("name","Survivor"),
+        "offer": offer,
+        "offer_qty": int(offer_qty),
+        "want": want,
+        "want_qty": int(want_qty),
+        "time": time.strftime("%H:%M:%S"),
+        "loc": player.get("location","")
+    }
+
+    # simpan di local
+    market_list = _load_market_local()
+    market_list.append(entry)
+    _save_market_local(market_list)
+
+    # push ke github bila online
+    if ONLINE_MODE:
+        ok, info = _push_market_to_github(market_list)
+        if ok:
+            slow("✅ Listing dikirim ke marketplace online.", 0.02)
+        else:
+            slow(f"⚠️ Listing disimpan lokal (GitHub error: {info})", 0.02)
+    else:
+        slow("✅ Listing disimpan lokal (offline).", 0.02)
+
+    save_game(player)  # simpan state player karena inventory berubah
+    time.sleep(0.8)
+
+def market_buy(player):
+    """
+    Flow buy (exact barter required):
+      - input nama item desired (the 'want' in listings)
+      - input qty desired (must match listing's want_qty)
+      - find listing(s) where want==desired AND want_qty==qty
+      - For each matching listing, check if buyer has enough of listing.offer >= offer_qty
+      - If found and buyer has enough, perform swap: deduct buyer.offer, add buyer.want,
+        remove listing from market, update remote.
+    """
+    clear()
+    console.print(Panel(Text("🛒  MARKET — BUY (barter)", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
+    market_list = market_refresh()
+    if not market_list:
+        slow("Marketplace kosong.", 0.02); time.sleep(0.6); return
+
+    # tampilkan market
+    console.print("\nCurrent listings:\n")
+    for m in market_list:
+        console.print(f"{m.get('seller')} : {m.get('offer_qty')}x {m.get('offer')}  ⇒  {m.get('want_qty')}x {m.get('want')}  ({m.get('loc','-')})")
+
+    desired = input("\nKetik NAMA item yang ingin kamu AMBIL (must match 'want' field): ").strip()
+    if not desired:
+        slow("❌ Input kosong.", 0.02); time.sleep(0.6); return
+    try:
+        desired_qty = int(input("Kuantiti yang ingin kamu ambil (angka): ").strip())
+        if desired_qty < 1:
+            raise ValueError
+    except Exception:
+        slow("❌ Kuantiti tidak valid.", 0.02); time.sleep(0.6); return
+
+    # cari listing yang match exactly want + want_qty
+    matches = [m for m in market_list if m.get("want") == desired and int(m.get("want_qty",0)) == desired_qty]
+
+    if not matches:
+        slow("❌ Tidak ada listing yang cocok (harus match nama & qty persis).", 0.02); time.sleep(0.8); return
+
+    # tampilkan matches (penjual dan apa yang mereka minta)
+    slow("\nListing cocok:")
+    for i, m in enumerate(matches, start=1):
+        slow(f"{i}. {m.get('seller')} meminta {m.get('offer_qty')}x {m.get('offer')} untuk {m.get('want_qty')}x {m.get('want')}")
+
+    # Pilih seller berdasarkan nomor (lebih aman daripada nama karena bisa multiple)
+    try:
+        pick = int(input("Pilih nomor listing untuk melakukan barter: ").strip())
+    except Exception:
+        slow("❌ Input tidak valid.", 0.02); time.sleep(0.6); return
+    if pick < 1 or pick > len(matches):
+        slow("❌ Nomor tidak valid.", 0.02); time.sleep(0.6); return
+
+    chosen = matches[pick - 1]
+    needed_offer_item = chosen.get("offer")
+    needed_offer_qty = int(chosen.get("offer_qty", 0))
+
+    # cek apakah buyer punya needed_offer_item dengan jumlah yang tepat (karena kita pilih exact rule)
+    if player["inventory"].get(needed_offer_item, 0) < needed_offer_qty:
+        slow(f"❌ Kamu tidak punya {needed_offer_qty}x {needed_offer_item} untuk barter.", 0.02); time.sleep(0.6); return
+
+    # Lakukan barter: kurangi buyer offer, tambahkan buyer want
+    player["inventory"][needed_offer_item] -= needed_offer_qty
+    if player["inventory"][needed_offer_item] <= 0:
+        del player["inventory"][needed_offer_item]
+    # tambahkan yang diterima
+    player["inventory"][desired] = player["inventory"].get(desired, 0) + desired_qty
+
+    # Hapus listing dari market_list (persist perubahan)
+    market_full = _load_market_local()
+    # hapus entry yang identik (seller, offer, offer_qty, want, want_qty, time)
+    def same_entry(a,b):
+        keys = ("seller","offer","offer_qty","want","want_qty","time")
+        return all(str(a.get(k)) == str(b.get(k)) for k in keys)
+    new_market = [m for m in market_full if not same_entry(m, chosen)]
+    _save_market_local(new_market)
+
+    # push change ke github jika online; jika gagal, simpan lokal tetap berlaku
+    if ONLINE_MODE:
+        ok, info = _push_market_to_github(new_market)
+        if ok:
+            slow("✅ Barter berhasil dan marketplace diupdate online.", 0.02)
+        else:
+            slow(f"⚠️ Barter berhasil tapi gagal update GitHub: {info}. Disimpan lokal.", 0.02)
+    else:
+        slow("✅ Barter berhasil. Marketplace diupdate lokal.", 0.02)
+
+    save_game(player)
+    time.sleep(0.8)
+
+def market_menu(player):
+    """
+    Command loop for marketplace:
+     - refresh : reload & display listings
+     - sell    : create new barter listing
+     - buy     : perform barter (exact)
+     - exit    : leave market
+    No numeric menu; all via command words.
+    """
+    while True:
+        clear()
+        header = Text(" ☣ MARKET — BARTER ☣ ", style=f"bold {HIGHLIGHT} on {HEADER_BG}")
+        console.print(Panel(header, box=box.DOUBLE, style=HEADER_BG))
+        # display current market summary
+        market_list = market_refresh()
+        if not market_list:
+            console.print(Panel(Text("Marketplace kosong.", style=HIGHLIGHT), box=box.ROUNDED, style=ACCENT))
+        else:
+            # print each listing compact
+            for m in market_list:
+                console.print(Panel(Text(f"{m.get('seller')} : {m.get('offer_qty')}x {m.get('offer')}  ⇒  {m.get('want_qty')}x {m.get('want')}", style=HIGHLIGHT),
+                                   box=box.ROUNDED, style=HEADER_BG))
+        console.print("\nCommands: refresh  |  sell  |  buy  |  exit\n")
+        cmd = input("market> ").strip().lower()
+        if cmd == "refresh":
+            # just loop; market_refresh called at top will reload
+            slow("↺ Refreshing marketplace...", 0.02)
+            time.sleep(0.6)
+            continue
+        elif cmd == "sell":
+            market_sell(player)
+            continue
+        elif cmd == "buy":
+            market_buy(player)
+            continue
+        elif cmd == "exit":
+            slow("Meninggalkan marketplace...", 0.02)
+            time.sleep(0.6)
+            return
+        else:
+            slow("Command tidak dikenal. Gunakan: refresh | sell | buy | exit", 0.02)
+            time.sleep(0.8)
+            continue
 # ---------------------------
 # Save / Load
 # ---------------------------
