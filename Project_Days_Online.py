@@ -1526,7 +1526,7 @@ def chat_menu(player):
 def market_menu(player):
     clear()
     slow("🌐 MARKETPLACE GLOBAL (20 terbaru)\n", 0.01)
-    data = fetch_market(limit=20)
+    data = market_refresh()
     for x in data:
         slow(f"[{x.get('time')}] {x.get('seller')} menjual {x.get('item')} ({x.get('qty')}) — {x.get('loc','-')}", 0.01)
     print()
