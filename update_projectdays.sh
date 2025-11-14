@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# PROJECT DAYS — ONLINE SIMPLE UPDATER v2.5
-
+# PROJECT DAYS — ONLINE SIMPLE UPDATER v2.6.3
 REPO_RAW="https://raw.githubusercontent.com/Vyoker/Project-Days-Online/main"
 GAME_DIR="$HOME/Project_Days"
 DATA_DIR="$GAME_DIR/data"
@@ -12,9 +11,9 @@ FILES=(
   "data/monsters.json"
   "data/events.json"
   "data/descriptions.json"
+  "data/crafting.json"
   "installer_projectdays.sh"
 )
-
 # === Warna Gaya Apocalypse ===
 BROWN_BG="\e[48;2;45;28;18m"
 TAN_FG="\e[38;2;205;170;125m"
@@ -23,7 +22,6 @@ RED_FG="\e[91m"
 YELLOW_FG="\e[93m"
 CYAN_FG="\e[96m"
 RESET="\e[0m"
-
 # === Spinner Animasi ===
 spinner() {
   local pid=$1
@@ -37,7 +35,6 @@ spinner() {
   done
   printf "\r${GREEN_FG}[✓]${RESET} Selesai.           \n"
 }
-
 # === Panel Header ===
 draw_panel() {
   local title="$1"
@@ -45,7 +42,6 @@ draw_panel() {
   printf "${BROWN_BG}${TAN_FG}│ %-60s │${RESET}\n" "$title"
   echo -e "${BROWN_BG}${TAN_FG}└──────────────────────────────────────────────────────────────┘${RESET}"
 }
-
 # === Start ===
 clear
 echo -e "${BROWN_BG}${TAN_FG}┌──────────────────────────────────────────────────────────────┐${RESET}"
@@ -58,7 +54,6 @@ mkdir -p "$DATA_DIR"
 pkg install -y python git curl > /dev/null 2>&1
 pip install requests rich > /dev/null 2>&1
 sleep 0.5
-
 # === Loop Unduh ===
 for f in "${FILES[@]}"; do
   echo ""
@@ -77,7 +72,6 @@ for f in "${FILES[@]}"; do
     echo -e "${RED_FG}[X]${RESET} Gagal mengunduh $(basename "$f")."
   fi
 done
-
 # === Cek Token GitHub ===
 if [ ! -f "$GAME_DIR/gh_token.txt" ]; then
   echo ""
@@ -87,7 +81,6 @@ if [ ! -f "$GAME_DIR/gh_token.txt" ]; then
   echo -e "${TAN_FG}dan simpan di:${RESET} ${CYAN_FG}$GAME_DIR/gh_token.txt${RESET}"
   touch "$GAME_DIR/gh_token.txt"
 fi
-
 # === Selesai ===
 echo ""
 draw_panel "UPDATE SELESAI!"
