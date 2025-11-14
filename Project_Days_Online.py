@@ -1430,7 +1430,7 @@ def drop_item(player):
         slow(f"Zombie menjatuhkan {jumlah}x {item}!", 0.02)
         time.sleep(0.6)
 # ---------------------------
-# Chatting
+# Chatting & Admin
 # ---------------------------
 def chat_menu(player):
     clear()
@@ -1503,9 +1503,9 @@ def chat_menu(player):
             display_chats()
             continue
         # ===================================================
-        # COMMAND: /event <uuid>;<item>;<qty>
+        # COMMAND: /gift <uuid>;<item>;<qty>
         # ===================================================
-        if msg.startswith("/event"):
+        if msg.startswith("/gift"):
             if not is_admin:
                 slow("❌ Kamu bukan admin. Tidak boleh menggunakan /event.", 0.02)
                 time.sleep(0.6)
@@ -1522,13 +1522,13 @@ def chat_menu(player):
                     qty = int(parts[2]) if len(parts) >= 3 else 1
                     ok, info = append_event(target_uuid, item, qty, sender=player.get("name"))
                     if ok:
-                        slow(f"✅ Event dikirim ke {target_uuid}: {qty}x {item}", 0.02)
+                        slow(f"✅ Item dikirim ke {target_uuid}: {qty}x {item}", 0.02)
                     else:
                         slow(f"⚠️ Gagal kirim event: {info}", 0.02)
                 else:
-                    slow("Format: /event <uuid>;<item>;<qty>", 0.02)
+                    slow("Format: /gift <uuid>;<item>;<qty>", 0.02)
             else:
-                slow("Format: /event <uuid>;<item>;<qty>", 0.02)
+                slow("Format: /gift <uuid>;<item>;<qty>", 0.02)
 
             time.sleep(0.6)
             display_chats()
