@@ -1,4 +1,4 @@
-# Project_Days_Online v2.6.3
+# Project_Days_Online v2.6.4
 # Requires: pip install requests rich
 
 import os, sys, time, random, json, base64, uuid, requests
@@ -1057,7 +1057,7 @@ def explore_menu(player):
         # Simpan progres setelah eksplor
         save_game(player)
 
-def dapat_item(player, lokasi):
+def dapat_item(player, lokasi, reward_exp):
     slow("Kamu menemukan sesuatu di sekitar...\n", 0.02)
     loot_table = {
         "Hutan": ["Kayu", "Batu", "Daun", "Makanan", "Minuman"],
