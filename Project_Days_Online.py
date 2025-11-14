@@ -1438,6 +1438,15 @@ def chat_menu(player):
     slow("Perintah admin: /ban  /gift  (hanya admin)\n", 0.01)
 
     def display_chats():
+        # Cek apakah ada hadiah event untuk player (gift)
+        deliveries = fetch_and_claim_events_for_player(player)
+        if deliveries:
+            for ev in deliveries:
+                item = ev.get("item")
+                qty = ev.get("qty", 1)
+                slow(f"🎁 Kamu menerima {qty}x {item} dari {ev.get('from','SYSTEM')}!", 0.01)
+            save_game(player)
+    
         chats = show_chat_preview(limit=20)
         clear()
         slow("📻 RADIO SURVIVOR — Chat Global\n", 0.01)
