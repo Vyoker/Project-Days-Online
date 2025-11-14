@@ -1503,9 +1503,9 @@ def chat_menu(player):
                     else:
                         slow(f"⚠️ Gagal kirim event: {info}", 0.02)
                 else:
-                    slow("Format: /event <UUID>;<item>;<qty>", 0.02)
+                    slow("Format: /event <uuid>;<item>;<qty>", 0.02)
             else:
-                slow("Format: /event <UUID>;<item>;<qty>", 0.02)
+                slow("Format: /event <uuid>;<item>;<qty>", 0.02)
             time.sleep(0.6)
             display_chats()
             continue
