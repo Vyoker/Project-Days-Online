@@ -1,0 +1,24 @@
+{
+  "Perban": {
+    "bahan": {
+      "Kain": 2
+    },
+    "hasil": {
+      "Perban": 1
+    },
+    "exp": 5,
+    "message": "🩹 Meracik Perban"
+  },
+
+  "Tombak": {
+    "bahan": {
+      "Kayu": 2,
+      "Batu": 1
+    },
+    "hasil": {
+      "Tombak": 1
+    },
+    "exp": 10,
+    "message": "⚒️ Membuat Tombak"
+  }
+}
