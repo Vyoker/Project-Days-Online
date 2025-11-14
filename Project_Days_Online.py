@@ -1057,6 +1057,10 @@ def dapat_item(player, lokasi):
     jumlah = random.randint(1, 3)
     player["inventory"][item] = player["inventory"].get(item, 0) + jumlah
     slow(f"Kamu mendapatkan {jumlah}x {item}!", 0.02)
+    # Tambahan EXP saat eksplorasi berhasil
+    player["exp"] += reward_exp
+    slow(f"+{reward_exp} EXP dari eksplorasi!", 0.02)
+    check_level_up(player)
     time.sleep(0.6)
 # ---------------------------
 # Battle (uses WEAPONS, MONSTERS, ARMORS, player stats)
