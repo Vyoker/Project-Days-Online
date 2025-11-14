@@ -1430,38 +1430,58 @@ def drop_item(player):
         slow(f"Zombie menjatuhkan {jumlah}x {item}!", 0.02)
         time.sleep(0.6)
 # ---------------------------
-# Chat & Market UI (admin commands)
+# Chatting
 # ---------------------------
 def chat_menu(player):
     clear()
     slow("📻 RADIO SURVIVOR — Chat Global (Ketik /exit untuk keluar)\n", 0.01)
     slow("Perintah admin: /ban  /event  (hanya admin)\n", 0.01)
+
     def display_chats():
         chats = show_chat_preview(limit=20)
         clear()
         slow("📻 RADIO SURVIVOR — Chat Global\n", 0.01)
         for c in chats:
-            user = c.get('user','?'); time_s = c.get('time',''); loc = c.get('loc','-'); msg = c.get('msg','')
+            user = c.get('user','?')
+            time_s = c.get('time','')
+            loc = c.get('loc','-')
+            msg = c.get('msg','')
             slow(f"[{time_s}] [{loc}] {user}: {msg}", 0.005)
         slow("\nKetik pesan. /exit untuk keluar. Admin: /ban, /event", 0.005)
+    # tampil awal
     display_chats()
     while True:
         msg = input("Pesan: ").strip()
         if msg == "":
             continue
+        # keluar
         if msg.lower() == "/exit":
             clear()
             slow("📻 Kamu meninggalkan radio survivor...\n", 0.02)
             time.sleep(0.5)
             return
+        # ================
+        # CHECK ADMIN FIX
+        # ================
         admin_uuid_local = None
         if os.path.exists(ADMIN_FILE):
             try:
                 admin_uuid_local = open(ADMIN_FILE,"r", encoding="utf-8").read().strip()
             except:
                 admin_uuid_local = None
-        is_admin = (player.get("uuid") == admin_uuid_local)
-        if msg.startswith("/ban") and is_admin:
+
+        player_uuid = player.get("uuid") or player.get("UUID")
+        is_admin = (player_uuid == admin_uuid_local)
+        # ===================================================
+        # COMMAND: /ban <uuid> <minutes>
+        # ===================================================
+        if msg.startswith("/ban"):
+            if not is_admin:
+                slow("❌ Kamu bukan admin. Tidak boleh menggunakan /ban.", 0.02)
+                time.sleep(0.6)
+                display_chats()
+                continue
+
             parts = msg.split()
             if len(parts) >= 2:
                 target_uuid = parts[1].strip()
@@ -1478,25 +1498,28 @@ def chat_menu(player):
                     slow(f"⚠️ Gagal menambahkan ban: {info}", 0.02)
             else:
                 slow("Gunakan: /ban <uuid> [minutes]", 0.02)
+
             time.sleep(0.6)
             display_chats()
             continue
-        if msg.startswith("/ban") and not is_admin:
-            slow("❌ Kamu bukan admin. Tidak boleh menggunakan /ban.", 0.02)
-            time.sleep(0.6)
-            display_chats()
-            continue
-        if msg.startswith("/event") and is_admin:
+        # ===================================================
+        # COMMAND: /event <uuid>;<item>;<qty>
+        # ===================================================
+        if msg.startswith("/event"):
+            if not is_admin:
+                slow("❌ Kamu bukan admin. Tidak boleh menggunakan /event.", 0.02)
+                time.sleep(0.6)
+                display_chats()
+                continue
+
             if " " in msg:
                 _, rest = msg.split(" ",1)
-                if ";" in rest:
-                    parts = rest.split(";")
-                else:
-                    parts = rest.split()
+                sep = ";" if ";" in rest else " "
+                parts = rest.split(sep)
                 if len(parts) >= 2:
                     target_uuid = parts[0].strip()
                     item = parts[1].strip()
-                    qty = int(parts[2]) if len(parts) >=3 else 1
+                    qty = int(parts[2]) if len(parts) >= 3 else 1
                     ok, info = append_event(target_uuid, item, qty, sender=player.get("name"))
                     if ok:
                         slow(f"✅ Event dikirim ke {target_uuid}: {qty}x {item}", 0.02)
@@ -1506,20 +1529,19 @@ def chat_menu(player):
                     slow("Format: /event <uuid>;<item>;<qty>", 0.02)
             else:
                 slow("Format: /event <uuid>;<item>;<qty>", 0.02)
+
             time.sleep(0.6)
             display_chats()
             continue
-        if msg.startswith("/event") and not is_admin:
-            slow("❌ Kamu bukan admin. Tidak boleh menggunakan /event.", 0.02)
-            time.sleep(0.6)
-            display_chats()
-            continue
-        # normal send
+        # ===================================================
+        # NORMAL CHAT
+        # ===================================================
         ok, info = send_chat_message(player, msg)
         if ok:
             slow("✅ Pesan terkirim.", 0.01)
         else:
             slow(f"⚠️ Gagal kirim pesan: {info}", 0.01)
+
         time.sleep(1)
         display_chats()
 # ---------------------------
