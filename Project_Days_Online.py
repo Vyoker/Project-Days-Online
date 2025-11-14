@@ -1,4 +1,4 @@
-# Project_Days_Online v2.6
+# Project_Days_Online v2.6.3
 # Requires: pip install requests rich
 
 import os, sys, time, random, json, base64, uuid, requests
@@ -160,6 +160,7 @@ ARMORS = load_json("armors.json", DEFAULT_ARMORS)
 MONSTERS = load_json("monsters.json", DEFAULT_MONSTERS)
 EVENTS = load_json("events.json", DEFAULT_EVENTS)
 DESCRIPTIONS = load_json("descriptions.json", DEFAULT_DESCRIPTIONS)
+CRAFTING = load_json("crafting.json", {})
 # ---------------------------
 # GitHub backend helpers (online)
 # ---------------------------
@@ -852,29 +853,54 @@ def buang_item(player):
 def crafting_menu(player):
     clear()
     console.print(Panel(Text("⚒️  MENU CRAFTING", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
-    console.print("\n1. Perban (Butuh: 2x Kain)\n2. Kayu Tajam (Butuh: 2x Kayu + 1x Batu)\n3. Kembali\n")
-    choice = input("Pilih resep: ").strip()
-    if choice == "1":
-        if player["inventory"].get("Kain", 0) >= 2:
-            loading_animation("🩹 Meracik Perban")
-            player["inventory"]["Kain"] -= 2
-            player["inventory"]["Perban"] = player["inventory"].get("Perban", 0) + 1
-            slow("Kamu berhasil membuat 1x Perban.", 0.01)
-        else:
-            slow("Bahan tidak cukup.", 0.01)
-    elif choice == "2":
-        if player["inventory"].get("Kayu", 0) >= 2 and player["inventory"].get("Batu", 0) >= 1:
-            loading_animation("⚒️ Membuat Kayu Tajam")
-            player["inventory"]["Kayu"] -= 2
-            player["inventory"]["Batu"] -= 1
-            player["inventory"]["Kayu Tajam"] = player["inventory"].get("Kayu Tajam", 0) + 1
-            slow("Kamu membuat 1x Kayu Tajam.", 0.01)
-        else:
-            slow("Bahan tidak cukup.", 0.01)
-    elif choice == "3":
+    if not CRAFTING:
+        slow("Tidak ada resep crafting di crafting.json", 0.02)
+        time.sleep(0.8)
         return
-    else:
+    resep_list = list(CRAFTING.keys())
+    # Tampilkan daftar crafting otomatis
+    for i, nama in enumerate(resep_list, start=1):
+        bahan_list = ", ".join(f"{b} x{jml}" for b, jml in CRAFTING[nama]["bahan"].items())
+        console.print(f"{i}. {nama} (Butuh: {bahan_list})")
+    console.print(f"{len(resep_list)+1}. Kembali\n")
+    pilihan = input("Pilih resep: ").strip()
+    if not pilihan.isdigit():
         slow("Pilihan tidak valid.", 0.02)
+        return
+    pilihan = int(pilihan)
+    if pilihan == len(resep_list) + 1:
+        return
+    if pilihan < 1 or pilihan > len(resep_list):
+        slow("Pilihan tidak valid.", 0.02)
+        return
+    # Ambil resep terpilih
+    nama_resep = resep_list[pilihan - 1]
+    resep = CRAFTING[nama_resep]
+    bahan = resep["bahan"]
+    hasil = resep["hasil"]
+    exp_reward = resep.get("exp", 0)
+    msg = resep.get("message", f"Membuat {nama_resep}")
+    # Cek bahan cukup
+    for item, jumlah in bahan.items():
+        if player["inventory"].get(item, 0) < jumlah:
+            slow("❌ Bahan tidak cukup!", 0.02)
+            return
+    # Kurangi bahan
+    for item, jumlah in bahan.items():
+        player["inventory"][item] -= jumlah
+        if player["inventory"][item] <= 0:
+            del player["inventory"][item]
+    # Tambahkan hasil crafting
+    for item, jumlah in hasil.items():
+        player["inventory"][item] = player["inventory"].get(item, 0) + jumlah
+    # Animasi crafting
+    loading_animation(msg)
+    slow(f"Berhasil membuat {nama_resep}!", 0.02)
+    # Reward EXP
+    if exp_reward > 0:
+        player["exp"] += exp_reward
+        slow(f"+{exp_reward} EXP dari crafting!", 0.02)
+        check_level_up(player)
     time.sleep(0.6)
 # ---------------------------
 # Travel & Shop & Barter
