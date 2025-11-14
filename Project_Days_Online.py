@@ -1522,42 +1522,6 @@ def chat_menu(player):
             slow(f"⚠️ Gagal kirim pesan: {info}", 0.01)
         time.sleep(1)
         display_chats()
-
-def market_menu(player):
-    clear()
-    slow("🌐 MARKETPLACE GLOBAL (20 terbaru)\n", 0.01)
-    data = market_refresh()
-    for x in data:
-        slow(f"[{x.get('time')}] {x.get('seller')} menjual {x.get('item')} ({x.get('qty')}) — {x.get('loc','-')}", 0.01)
-    print()
-    pilihan = input("1: Jual item | Enter: Kembali > ").strip()
-    if pilihan == "1":
-        inv = player.get("inventory", {})
-        if not inv:
-            slow("Inventory kosong.", 0.02)
-            return
-        slow("Pilih item yang ingin dijual:", 0.01)
-        items = list(inv.items())
-        for i, (k, v) in enumerate(items, start=1):
-            slow(f"{i}. {k} ({v})", 0.01)
-        try:
-            c = int(input("Nomor item: ").strip())
-            name, qty_have = items[c-1]
-            qty_sell = int(input(f"Jumlah jual (max {qty_have}): ").strip())
-            if qty_sell < 1 or qty_sell > qty_have:
-                slow("Jumlah tidak valid.", 0.02)
-                return
-            ok, info = post_market_item(player, name, qty_sell)
-            if ok:
-                player["inventory"][name] -= qty_sell
-                if player["inventory"][name] <= 0:
-                    del player["inventory"][name]
-                slow("Item dikirim ke marketplace global.", 0.02)
-            else:
-                slow(f"Gagal kirim listing: {info}", 0.02)
-        except Exception:
-            slow("Input tidak valid.", 0.02)
-            return
 # ---------------------------
 # Main entry
 # ---------------------------
