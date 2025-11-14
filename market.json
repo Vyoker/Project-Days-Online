@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "seller": "Zahra",
+    "offer": "Makanan",
+    "offer_qty": 3,
+    "want": "Jaket",
+    "want_qty": 3,
+    "time": "17:03:05",
+    "loc": "Hutan Pinggiran"
+  }
+]
