@@ -25,6 +25,11 @@
       "hp": 10,
       "energy": 30
     },
+    "Bolu": {
+      "desc": "Bolu ulang tahun. Menambah HP dan energy.",
+      "hp": 25,
+      "energy": 30
+    },
     "Minuman": {
       "desc": "Air bersih dalam botol berdebu, sangat berharga di dunia yang kering.",
       "hp": 0,
