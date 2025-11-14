@@ -1,16 +1,14 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # ==========================================
 # ☣ Project Days Online - Auto Installer (Termux)
-# Versi: 1.2
+# Versi: 1.4
 # ==========================================
-
 # Warna
 GREEN="\033[1;32m"
 YELLOW="\033[1;33m"
 CYAN="\033[1;36m"
 RED="\033[1;31m"
 RESET="\033[0m"
-
 # Fungsi animasi loading titik
 progress_dots() {
     local message=$1
@@ -21,7 +19,6 @@ progress_dots() {
     done
     echo
 }
-
 # Header
 clear
 echo -e "${YELLOW}"
@@ -30,7 +27,6 @@ echo "   ☣ PROJECT DAYS ONLINE - INSTALLER ☣"
 echo "=========================================="
 echo -e "${RESET}"
 sleep 1
-
 # Step 1 - Update system
 progress_dots "🧩 [1/6] Memperbarui sistem Termux"
 pkg update -y >/dev/null 2>&1 && pkg upgrade -y >/dev/null 2>&1
@@ -40,7 +36,6 @@ else
     echo -e "${RED}❌ Gagal memperbarui sistem${RESET}"
 fi
 sleep 0.5
-
 # Step 2 - Install dependencies
 progress_dots "📦 [2/6] Menginstal dependensi (Python, pip, curl)"
 pkg install python git curl -y >/dev/null 2>&1
@@ -51,7 +46,6 @@ else
     echo -e "${RED}❌ Gagal menginstal dependensi${RESET}"
 fi
 sleep 0.5
-
 # Step 3 - Create game folder
 progress_dots "📁 [3/6] Menyiapkan folder game"
 cd ~
@@ -59,7 +53,6 @@ mkdir -p Project_Days && cd Project_Days
 mkdir -p saves
 sleep 0.3
 echo -e "${GREEN}✅ Folder game siap${RESET}"
-
 # Step 4 - Download game file only
 progress_dots "🔽 [4/6] Mengunduh Project_Days_Online.py dari GitHub"
 curl -L -# -o Project_Days_Online.py https://raw.githubusercontent.com/Vyoker/Project-Days-Online/main/Project_Days_Online.py
@@ -71,7 +64,6 @@ else
     echo -e "${GREEN}✅ File Project_Days_Online.py berhasil diunduh${RESET}"
 fi
 sleep 0.5
-
 # Step 5 - GitHub token input
 echo
 echo -e "${YELLOW}🔑 [5/6] Token GitHub (opsional untuk mode online)${RESET}"
@@ -89,12 +81,10 @@ else
     echo -e "${YELLOW}⚠️ Tidak ada token. Game akan berjalan dalam Mode Read-Only (Offline).${RESET}"
 fi
 sleep 0.5
-
 # Step 6 - Jalankan game
 progress_dots "🚀 [6/6] Menjalankan Project Days Online"
 sleep 1
 python3 Project_Days_Online.py
-
 # Pesan akhir
 echo -e "${YELLOW}"
 echo "=========================================="
