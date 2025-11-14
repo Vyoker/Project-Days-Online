@@ -20,6 +20,11 @@
     "hp": 10,
     "energy": 30
   },
+  "Bolu": {
+    "type": "food",
+    "hp": 25
+    "energy": 30
+  },
   "Minuman": {
     "type": "drink",
     "energy": 20
