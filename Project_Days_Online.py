@@ -1207,13 +1207,13 @@ def barter_shop(player):
     kota_gunung  = ["Bandung", "Malang", "Bogor", "Tasikmalaya", "Solo"]
     kota_besar   = ["Jakarta", "Yogyakarta", "Semarang", "Medan", "Palembang", "Samarinda"]
     if player["location"] in kota_pesisir:
-        stok_pedagang = ["Ikan Kering", "Air Laut", "Obat Luka", "Kayu", "Pisau"]
+        stok_pedagang = ["Makanan", "Minuman", "Painkiller", "Kayu", "Pisau"]
     elif player["location"] in kota_gunung:
-        stok_pedagang = ["Kayu", "Batu", "Daun Herbal", "Obat", "Tombak"]
+        stok_pedagang = ["Kayu", "Batu", "Daun", "Painkiller", "Tombak"]
     elif player["location"] in kota_besar:
-        stok_pedagang = ["Ammo 9mm", "Makanan Kaleng", "Perban", "Minuman", "Kain"]
+        stok_pedagang = ["Ammo 9mm", "Makanan", "Perban", "Minuman", "Kain"]
     else:
-        stok_pedagang = ["Kain", "Obat", "Batu", "Kayu", "Minuman"]
+        stok_pedagang = ["Kain", "Painkiller", "Batu", "Kayu", "Minuman"]
     while True:
         clear()
         console.print(Panel(Text(f"🤝  KIOS BARTER — {player['location']}", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
