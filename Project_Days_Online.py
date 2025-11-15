@@ -404,10 +404,10 @@ def market_refresh():
     if status == 200 and isinstance(remote, list):
         # sinkronkan juga ke local agar offline nanti up-to-date
         _save_market_local(remote)
-        return remote
+        return _load_market_local()
     # fallback ke local
     local = _load_market_local()
-    return local
+    return _load_market_local()
 
 def _list_all_valid_item_names():
     # gabungkan semua nama item/senjata/armor untuk tampilan pilihan saat sell
