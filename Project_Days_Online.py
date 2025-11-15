@@ -1164,10 +1164,11 @@ def travel_menu(player):
         "Jakarta", "Bandung", "Surabaya", "Yogyakarta", "Semarang", "Medan",
         "Palembang", "Makassar", "Denpasar", "Balikpapan", "Malang", "Pontianak",
         "Manado", "Padang", "Samarinda", "Banjarmasin", "Cirebon", "Tasikmalaya",
-        "Solo", "Bogor", "Batam", "Pekanbaru", "Kupang", "Jayapura", "Mataram"
+        "Solo", "Bogor", "Batam", "Pekanbaru", "Kupang", "Jayapura", "Mataram",
+        "Hutan Pinggiran"
     ]
     tujuan = random.choice([k for k in kota_indonesia if k != player["location"]])
-    biaya = random.randint(30, 60)
+    biaya = random.randint(25, 50)
     if player["energy"] < biaya:
         slow("Energi kamu tidak cukup untuk melakukan perjalanan jauh.", 0.02)
         time.sleep(0.6)
