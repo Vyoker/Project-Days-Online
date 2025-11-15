@@ -7,5 +7,14 @@
     "want_qty": 3,
     "time": "17:03:05",
     "loc": "Hutan Pinggiran"
+  },
+  {
+    "seller": "Vyoker",
+    "offer": "Daun",
+    "offer_qty": 2,
+    "want": "Kayu",
+    "want_qty": 1,
+    "time": "07:09:30",
+    "loc": "Hutan Pinggiran"
   }
 ]
