@@ -1,18 +1,26 @@
 #!/usr/bin/env bash
-# PROJECT DAYS — RECURSIVE AUTO UPDATER v1.0.0
-# Repo: Vyoker/Project-Days-Online
+# PROJECT DAYS — ONLINE SIMPLE UPDATER v2.5
 
-set -euo pipefail
+REPO_RAW="https://raw.githubusercontent.com/Vyoker/Project-Days-Online/main"
+GAME_DIR="$HOME/Project_Days"
+DATA_DIR="$GAME_DIR/data"
+FILES=(
+  "Project_Days_Online.py"
+  "data/items.json"
+  "data/weapons.json"
+  "data/armors.json"
+  "data/monsters.json"
+  "data/events.json"
+  "data/descriptions.json"
+  "installer_projectdays.sh"
+  "data/cities.json"
+  "data/crafting.json"
+  "data/dialogs.json"
+  "data/settings.json"
+  "data/quests.json"
+)
 
-REPO="Vyoker/Project-Days-Online"
-BRANCH="main"
-API_URL="https://api.github.com/repos/${REPO}/git/trees/${BRANCH}?recursive=1"
-RAW_BASE="https://raw.githubusercontent.com/${REPO}/${BRANCH}"
-GAME_DIR="${HOME}/Project_Days"
-TMP_DIR="${GAME_DIR}/.upd_tmp"
-TOKEN_FILE="${GAME_DIR}/gh_token.txt"
-
-# UI Colors
+# === Warna Gaya Apocalypse ===
 BROWN_BG="\e[48;2;45;28;18m"
 TAN_FG="\e[38;2;205;170;125m"
 GREEN_FG="\e[92m"
@@ -21,125 +29,76 @@ YELLOW_FG="\e[93m"
 CYAN_FG="\e[96m"
 RESET="\e[0m"
 
+# === Spinner Animasi ===
 spinner() {
   local pid=$1
-  local spin_chars=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
-  local delay=0.06
-
+  local spin=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
+  local delay=0.08
   while kill -0 "$pid" 2>/dev/null; do
-    for c in "${spin_chars[@]}"; do
+    for c in "${spin[@]}"; do
       printf "\r${YELLOW_FG}[${c}]${RESET} Mengunduh..."
       sleep $delay
     done
   done
-
-  printf "\r${GREEN_FG}[✓]${RESET} Selesai.                     \n"
+  printf "\r${GREEN_FG}[✓]${RESET} Selesai.           \n"
 }
 
-panel() {
+# === Panel Header ===
+draw_panel() {
   local title="$1"
-  echo -e "${BROWN_BG}${TAN_FG}┌────────────────────────────────────────────────────────────────┐${RESET}"
-  printf "${BROWN_BG}${TAN_FG}│ %-64s │${RESET}\n" "$title"
-  echo -e "${BROWN_BG}${TAN_FG}└────────────────────────────────────────────────────────────────┘${RESET}"
+    echo -e "${BROWN_BG}${TAN_FG}┌──────────────────────────────────────────────────────────────┐${RESET}"
+  printf "${BROWN_BG}${TAN_FG}│ %-60s │${RESET}\n" "$title"
+  echo -e "${BROWN_BG}${TAN_FG}└──────────────────────────────────────────────────────────────┘${RESET}"
 }
 
-ensure_requirements() {
-  command -v curl >/dev/null || { echo -e "${RED_FG}curl tidak ditemukan. Install pkg install curl${RESET}"; exit 1; }
-  command -v python3 >/dev/null || { echo -e "${RED_FG}python3 tidak ditemukan. Install pkg install python${RESET}"; exit 1; }
-}
-
-get_auth_header() {
-  if [ -n "${GH_TOKEN-}" ]; then
-    echo "-H" "Authorization: token ${GH_TOKEN}"
-    return
-  fi
-
-  if [ -f "${TOKEN_FILE}" ]; then
-    local t
-    t=$(sed -n '1p' "$TOKEN_FILE" | tr -d '[:space:]')
-    if [ -n "$t" ]; then
-      echo "-H" "Authorization: token ${t}"
-      return
-    fi
-  fi
-
-  echo ""
-}
-
-ensure_requirements
-mkdir -p "$GAME_DIR"
-mkdir -p "$TMP_DIR"
-
-panel "PROJECT DAYS — AUTO UPDATER (repo: ${REPO})"
+# === Start ===
+clear
+echo -e "${BROWN_BG}${TAN_FG}┌──────────────────────────────────────────────────────────────┐${RESET}"
+echo -e "${BROWN_BG}${TAN_FG}│ ☣  PROJECT DAYS — ONLINE: DATA UPDATER (FAST MODE) ☣ │${RESET}"
+echo -e "${BROWN_BG}${TAN_FG}└──────────────────────────────────────────────────────────────┘${RESET}"
 echo ""
 
-panel "Mengambil daftar file dari GitHub API"
-AUTH_HEADER="$(get_auth_header)"
+echo -e "${TAN_FG}📦 Menyiapkan direktori dan dependensi...${RESET}"
+mkdir -p "$DATA_DIR"
+pkg install -y python git curl > /dev/null 2>&1
+pip install requests rich > /dev/null 2>&1
+sleep 0.5
 
-if [ -n "$AUTH_HEADER" ]; then
-  eval "curl -s -L ${AUTH_HEADER} \"${API_URL}\" -o \"${TMP_DIR}/tree.json\""
-else
-  curl -s -L "$API_URL" -o "$TMP_DIR/tree.json"
-fi
+# === Loop Unduh ===
+for f in "${FILES[@]}"; do
+  echo ""
+  draw_panel "Mengunduh: $(basename "$f")"
+  url="$REPO_RAW/$f"
+  target="$GAME_DIR/$(basename "$f")"
+  [[ "$f" == data/* ]] && target="$DATA_DIR/$(basename "$f")"
 
-# Extract file list
-mapfile -t FILES < <(python3 - <<'PY'
-import sys, json
-t = json.load(open(sys.argv[1]))
-for e in t.get("tree", []):
-    if e.get("type") == "blob":
-        print(e.get("path"))
-PY
-"$TMP_DIR/tree.json")
-
-total=${#FILES[@]}
-
-if [ "$total" -eq 0 ]; then
-  echo -e "${RED_FG}Daftar file kosong! API bermasalah atau repo salah.${RESET}"
-  exit 1
-fi
-
-panel "Mulai mengunduh semua file (total: ${total})"
-
-count=0
-for path in "${FILES[@]}"; do
-  count=$((count+1))
-
-  # Skip .git files
-  [[ "$path" == .git* ]] && continue
-
-  target_dir="${GAME_DIR}/$(dirname "$path")"
-  target="${GAME_DIR}/${path}"
-  tmp_target="${TMP_DIR}/$(echo "$path" | sed 's|/|_|g').tmp"
-
-  mkdir -p "$target_dir"
-
-  url="${RAW_BASE}/${path}"
-
-  panel "(${count}/${total}) Mengunduh: ${path}"
-
-  if [ -n "$AUTH_HEADER" ]; then
-    eval "curl -s -L ${AUTH_HEADER} \"${url}\" -o \"${tmp_target}\" &"
-  else
-    curl -s -L "$url" -o "$tmp_target" &
-  fi
-
+  (curl -s -L --fail "$url" -o "$target") &
   pid=$!
   spinner $pid
-  wait $pid || true
 
-  if [ ! -s "$tmp_target" ]; then
-    echo -e "${RED_FG}[X] Gagal mengunduh: ${path}${RESET}"
-    rm -f "$tmp_target"
-    continue
+  if [ $? -eq 0 ]; then
+    echo -e "${GREEN_FG}[OK]${RESET} $(basename "$f") berhasil diunduh."
+  else
+    echo -e "${RED_FG}[X]${RESET} Gagal mengunduh $(basename "$f")."
   fi
-
-  mv -f "$tmp_target" "$target"
-  echo -e "${GREEN_FG}[OK]${RESET} ${path} diperbarui."
 done
 
-rm -rf "$TMP_DIR"
+# === Cek Token GitHub ===
+if [ ! -f "$GAME_DIR/gh_token.txt" ]; then
+  echo ""
+  draw_panel "Token GitHub belum ditemukan!"
+  echo -e "${YELLOW_FG}Buat token di:${RESET}"
+  echo -e "${CYAN_FG}https://github.com/settings/tokens${RESET}"
+  echo -e "${TAN_FG}dan simpan di:${RESET} ${CYAN_FG}$GAME_DIR/gh_token.txt${RESET}"
+  touch "$GAME_DIR/gh_token.txt"
+fi
 
-panel "UPDATE SELESAI"
-echo -e "${GREEN_FG}Semua file diperbarui.${RESET}"
-echo -e "${CYAN_FG}cd $GAME_DIR && python3 Project_Days_Online.py${RESET}"
+# === Selesai ===
+echo ""
+draw_panel "UPDATE SELESAI!"
+echo -e "${GREEN_FG}Game telah diperbarui ke versi terbaru.${RESET}"
+echo -e "Untuk menjalankan game:"
+echo -e "  ${CYAN_FG}cd ~/Project_Days && python3 Project_Days_Online.py${RESET}"
+echo ""
+echo -e "${TAN_FG}Selamat datang kembali di dunia Apocalypse.${RESET}"
+echo ""
