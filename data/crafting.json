@@ -9,7 +9,18 @@
     "exp": 5,
     "message": "🩹 Meracik Perban"
   },
-
+  
+  "Herbal" {
+    "bahan": {
+      "Daun": 2
+    },
+    "hasil": {
+      "Herbal": 1
+    },
+    "exp": 4,
+    "message": "🧪 Meracik Herbal"
+  },
+  
   "Tombak": {
     "bahan": {
       "Kayu": 2,
