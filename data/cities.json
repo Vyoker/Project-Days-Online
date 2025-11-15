@@ -1,0 +1,20 @@
+{
+  "Jakarta": {
+    "type": "city"
+  },
+  "Bandung": {
+    "type": "mountain"
+  },
+  "Surabaya": {
+    "type": "coastal"
+  },
+  "Makassar": {
+    "type": "coastal"
+  },
+  "Yogyakarta": {
+    "type": "city"
+  },
+  "Denpasar": {
+    "type": "coastal"
+  }
+}
