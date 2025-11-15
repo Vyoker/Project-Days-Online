@@ -37,5 +37,23 @@
   },
   "Daun": {
     "type": "material"
+  },
+  "Arang": {
+    "type": "material"
+  },
+  "Tembaga": {
+    "type": "material"
+  },
+  "Besi": {
+    "type": "material"
+  },
+  "Perak": {
+    "type": "material"
+  },
+  "Emas": {
+    "type": "material"
+  },
+  "Diamond": {
+    "type": "material"
   }
 }
