@@ -813,7 +813,7 @@ def check_level_up(player):
     while player.get('exp', 0) >= player.get('exp_to_next', 100):
         player['exp'] -= player['exp_to_next']
         player['level'] += 1
-        player['exp_to_next'] = player.get('exp_to_next',100) + 50
+        player['exp_to_next'] = int(player.get('exp_to_next',100) * 1.5)
         player['atk'] += 2
         player['def'] += 1
         player['dex'] += 1
