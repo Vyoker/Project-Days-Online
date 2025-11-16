@@ -931,6 +931,14 @@ def main_menu(player):
         else:
             slow("Pilihan tidak valid.", 0.02)
             time.sleep(0.6)
+
+def ensure_player_quests(player):
+    if "quests" not in player:
+        player["quests"] = {
+            "main_active": None,      # quest code string: "001", "002", ...
+            "side_active": [],        # list of quest code: ["S001"]
+            "completed": []           # list of completed quest codes
+        }
 # ---------------------------
 # Inventory & crafting (use JSON data)
 # ---------------------------
@@ -1163,86 +1171,206 @@ def crafting_menu(player):
 # Quests
 # ---------------------------
 def quests_menu(player):
+    ensure_player_quests(player)
+    q = player["quests"]
+    MQ = GLOBAL_QUESTS["main"]
+    SQ = GLOBAL_QUESTS["side"]
+
     clear()
     console.print(Panel(Text("🗒️ QUESTS 🗒️", style=HIGHLIGHT), box=box.DOUBLE, style=HEADER_BG))
-    # Pastikan struktur quest ada
-    if "quests" not in player:
-        player["quests"] = {
-            "main": [],
-            "side": [],
-            "completed": []
-        }
-
-    q = player["quests"]
-
-    console.print("Selesaikan Quest:\n", style=HIGHLIGHT)
-
-    console.print("Main:", style=HIGHLIGHT)
-    if q["main"]:
-        for m in q["main"]:
-            console.print(f"❎ {m}")
+    # =====================
+    # TAMPILKAN QUEST AKTIF
+    # =====================
+    console.print("Misi Utama Aktif:", style=HIGHLIGHT)
+    if q["main_active"]:
+        code = q["main_active"]
+        console.print(f"❎ {MQ[code]['name']} — {MQ[code]['desc']}")
     else:
-        console.print("❎ (Tidak ada misi)", style=HIGHLIGHT)
+        console.print("❎ Tidak ada misi utama aktif.")
 
-    console.print("\nSide:", style=HIGHLIGHT)
-    if q["side"]:
-        for s in q["side"]:
-            console.print(f"❎ {s}")
+    console.print("\nMisi Sampingan Aktif:", style=HIGHLIGHT)
+    if q["side_active"]:
+        for code in q["side_active"]:
+            console.print(f"❎ {SQ[code]['name']} — {SQ[code]['desc']}")
     else:
-        console.print("❎ (Tidak ada misi)", style=HIGHLIGHT)
-
-    console.print("\n_______________", style=HIGHLIGHT)
+        console.print("❎ Tidak ada misi sampingan aktif.")
+    # ==============
+    # QUEST SELESAI
+    # ==============
+    console.print("\n_______________")
     console.print("Quest Terselesaikan:", style=HIGHLIGHT)
     if q["completed"]:
-        for c in q["completed"]:
-            console.print(f"✅ {c}")
+        for code in q["completed"]:
+            name = (
+                MQ[code]["name"]
+                if code in MQ else
+                SQ[code]["name"]
+            )
+            console.print(f"✅ {name}")
     else:
-        console.print("(Belum ada)", style=HIGHLIGHT)
-    console.print("_______________\n", style=HIGHLIGHT)
-
-    console.print("1. Lihat misi")
-    console.print("2. Ambil Misi")
-    console.print("3. Batalkan Misi")
-    console.print("4. Selesaikan Misi")
+        console.print("(Belum ada)")
+    console.print("_______________\n")
+    # =====
+    # MENU
+    # =====
+    console.print("1. Lihat Daftar Misi")
+    console.print("2. Ambil Misi Utama (berurutan)")
+    console.print("3. Ambil Misi Sampingan")
+    console.print("4. Cek & Selesaikan Misi")
     console.print("5. Kembali\n")
 
-    choice = input("Pilih: ").strip()
+    pilih = input("Pilih: ").strip()
+    # ==========================
+    # 1. LIST QUEST dari GitHub
+    # ==========================
+    if pilih == "1":
+        clear()
+        console.print(Panel(Text("📜 Daftar Misi Global", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
 
-    if choice == "1":
-        input("Tekan enter untuk kembali...")
+        console.print("\nMisi Utama:")
+        for code, data in MQ.items():
+            console.print(f"{code} — {data['name']}")
+
+        console.print("\nMisi Sampingan:")
+        for code, data in SQ.items():
+            console.print(f"{code} — {data['name']}")
+
+        input("\nTekan Enter...")
         return
-    elif choice == "2":
-        nama = input("Nama misi baru: ").strip()
-        tipe = input("Tipe (main/side): ").strip().lower()
-        if tipe not in ("main", "side"):
-            slow("Tipe tidak valid!", 0.02)
+    # ====================================
+    # 2. AMBIL MISI UTAMA (berurutan)
+    # ====================================
+    elif pilih == "2":
+        if q["main_active"]:
+            slow("❌ Kamu sudah punya misi utama aktif.", 0.02)
             return
-        q[tipe].append(nama)
-        slow("Misi ditambahkan.", 0.02)
+        # cari misi pertama yang belum selesai
+        for code, data in MQ.items():
+            if code not in q["completed"]:
+                q["main_active"] = code
+                save_game(player)
+                slow(f"📌 Misi utama '{data['name']}' diambil!", 0.02)
+                return
+
+        slow("Semua misi utama telah selesai!", 0.02)
+        return
+    # ========================
+    # 3. AMBIL MISI SAMPINGAN
+    # ========================
+    elif pilih == "3":
+        kode = input("Masukkan kode misi sampingan (contoh: S001): ").strip().upper()
+
+        if kode not in SQ:
+            slow("❌ Kode tidak ditemukan.", 0.02)
+            return
+
+        if kode in q["side_active"] or kode in q["completed"]:
+            slow("❌ Misi sudah aktif atau sudah selesai.", 0.02)
+            return
+
+        q["side_active"].append(kode)
         save_game(player)
+        slow(f"📌 Misi '{SQ[kode]['name']}' diambil!", 0.02)
+        return
+    # ====================================
+    # 4. CEK & SELESAIKAN MISI
+    # ====================================
+    elif pilih == "4":
+        # ----- Misi Utama -----
+        if q["main_active"]:
+            code = q["main_active"]
+            req = MQ[code]["requirements"]
+            # requirement: LOCATION
+            if "location" in req:
+                if player["location"] == req["location"]:
+                    # Selesaikan quest
+                    q["completed"].append(code)
+                    q["main_active"] = MQ[code].get("next")
+                    # Reward
+                    reward = MQ[code]["rewards"]
+                    player["exp"] += reward["EXP"]
 
-    elif choice == "3":
-        nama = input("Nama misi yang ingin dibatalkan: ").strip()
-        for k in ("main", "side"):
-            if nama in q[k]:
-                q[k].remove(nama)
-                slow("Misi dibatalkan.", 0.02)
-                save_game(player)
-                return
-        slow("Misi tidak ditemukan.", 0.02)
+                    for item, qty in reward["items"].items():
+                        player["inventory"][item] = player["inventory"].get(item, 0) + qty
 
-    elif choice == "4":
-        nama = input("Nama misi yang selesai: ").strip()
-        for k in ("main", "side"):
-            if nama in q[k]:
-                q[k].remove(nama)
-                q["completed"].append(nama)
-                slow("Misi diselesaikan!", 0.02)
-                save_game(player)
-                return
-        slow("Misi tidak ditemukan.", 0.02)
+                    save_game(player)
+                    slow(f"🎉 Misi utama '{MQ[code]['name']}' selesai!", 0.02)
+                    return
+            # requirement: ITEMS
+            if "items" in req:
+                ok = True
+                for item, qty in req["items"].items():
+                    if player["inventory"].get(item, 0) < qty:
+                        ok = False
+                if ok:
+                    # Ambil item
+                    for item, qty in req["items"].items():
+                        player["inventory"][item] -= qty
+                        if player["inventory"][item] <= 0:
+                            del player["inventory"][item]
+                    # Selesaikan
+                    q["completed"].append(code)
+                    q["main_active"] = MQ[code"].get("next")
 
-    elif choice == "5":
+                    reward = MQ[code]["rewards"]
+                    player["exp"] += reward["EXP"]
+
+                    for item, qty in reward["items"].items():
+                        player["inventory"][item] = player["inventory"].get(item, 0) + qty
+
+                    save_game(player)
+                    slow(f"🎉 Misi utama '{MQ[code]['name']}' selesai!", 0.02)
+                    return
+        # ----- Misi Sampingan -----
+        for code in list(q["side_active"]):
+            req = SQ[code]["requirements"]
+            # Location type
+            if "location" in req:
+                if player["location"] == req["location"]:
+                    # complete
+                    q["completed"].append(code)
+                    q["side_active"].remove(code)
+
+                    reward = SQ[code]["rewards"]
+                    player["exp"] += reward["EXP"]
+                    for item, qty in reward["items"].items():
+                        player["inventory"][item] = player["inventory"].get(item, 0) + qty
+
+                    save_game(player)
+                    slow(f"🎉 Misi '{SQ[code]['name']}' selesai!", 0.02)
+                    return
+            # Items type
+            if "items" in req:
+                ok = True
+                for item, qty in req["items"].items():
+                    if player["inventory"].get(item, 0) < qty:
+                        ok = False
+
+                if ok:
+                    # remove items
+                    for item, qty in req["items"].items():
+                        player["inventory"][item] -= qty
+                        if player["inventory"][item] <= 0:
+                            del player["inventory"][item]
+
+                    q["completed"].append(code)
+                    q["side_active"].remove(code)
+
+                    reward = SQ[code]["rewards"]
+                    player["exp"] += reward["EXP"]
+                    for item, qty in reward["items"].items():
+                        player["inventory"][item] = player["inventory"].get(item, 0) + qty
+
+                    save_game(player)
+                    slow(f"🎉 Misi '{SQ[code]['name']}' selesai!", 0.02)
+                    return
+
+        slow("❌ Tidak ada misi yang bisa diselesaikan saat ini.", 0.02)
+        return
+    # ================
+    # 5. KEMBALI
+    # ================
+    elif pilih == "5":
         return
 # ---------------------------
 # Travel & Shop & Barter
