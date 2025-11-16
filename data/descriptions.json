@@ -49,6 +49,36 @@
       "desc": "Daun hijau yang masih tumbuh di tanah mati, bahan dasar ramuan herbal.",
       "hp": 0,
       "energy": 0
+    },
+    "Arang": {
+      "desc": "Kayu yang telah dibakar",
+      "hp": 0,
+      "energy": 0
+    },
+    "Tembaga": {
+      "desc": "Logam yang lunak dan mudah untuk ditempa",
+      "hp": 0,
+      "energy": 0
+    },
+    "Besi": {
+      "desc": "Bahan yang kuat untuk membuat sesuatu",
+      "hp": 0,
+      "energy": 0
+    },
+    "Perak": {
+      "desc": "Logam yang mempunyai nilai bagus",
+      "hp": 0,
+      "energy": 0
+    },
+    "Emas": {
+      "desc": "Logam yang mempunyai nilai tinggi, berkilau memanjakan mata",
+      "hp": 0,
+      "energy": 0
+    },
+    "Diamond": {
+      "desc": "Logam yang mempunyai nilai sangat tinggi, kuat dan cantik",
+      "hp": 0,
+      "energy": 0
     }
   },
 
