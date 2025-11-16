@@ -2,45 +2,85 @@
   "Tangan Kosong": {
     "type": "melee",
     "atk": 5
+    "bonus": {
+      "atk_percent": 0,
+      "def_percent": 0,
+      "dex_percent": 0
   },
   "Pisau": {
     "type": "melee",
     "atk": 8
+    "bonus": {
+      "atk_percent": 5,
+      "def_percent": 0,
+      "dex_percent": 5
   },
   "Palu": {
     "type": "melee",
     "atk": 12
+    "bonus": {
+      "atk_percent": 10,
+      "def_percent": 0,
+      "dex_percent": 0
   },
   "Tombak": {
     "type": "melee",
     "atk": 16
+    "bonus": {
+      "atk_percent": 10,
+      "def_percent": 0,
+      "dex_percent": 0
   },
   "Kampak": {
     "type": "melee",
     "atk": 20
+    "bonus": {
+      "atk_percent": 15,
+      "def_percent": 0,
+      "dex_percent": 0
   },
   "Pedang": {
     "type": "melee",
     "atk": 25
+    "bonus": {
+      "atk_percent": 20,
+      "def_percent": 0,
+      "dex_percent": 0
   },
   "Pistol": {
     "type": "gun",
     "atk": 35,
     "ammo": "Ammo 9mm"
+    "bonus": {
+      "atk_percent": 5,
+      "def_percent": 0,
+      "dex_percent": 5
   },
   "Shotgun": {
     "type": "gun",
     "atk": 55,
     "ammo": "Ammo 12mm"
+    "bonus": {
+      "atk_percent": 10,
+      "def_percent": 0,
+      "dex_percent": 5
   },
   "Sniper": {
     "type": "gun",
     "atk": 95,
     "ammo": "Ammo 7.2mm"
+    "bonus": {
+      "atk_percent": 10,
+      "def_percent": 0,
+      "dex_percent": 10
   },
   "Senapan Serbu": {
     "type": "gun",
     "atk": 60,
     "ammo": "Ammo 7.2mm"
+    "bonus": {
+      "atk_percent": 10,
+      "def_percent": 0,
+      "dex_percent": 5
   }
 }
