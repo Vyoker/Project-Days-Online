@@ -159,6 +159,16 @@ MONSTERS = load_json("monsters.json", DEFAULT_MONSTERS)
 EVENTS = load_json("events.json", DEFAULT_EVENTS)
 DESCRIPTIONS = load_json("descriptions.json", DEFAULT_DESCRIPTIONS)
 CRAFTING = load_json("crafting.json", {})
+# --------------
+# Quests Backend
+# --------------
+def fetch_quests():
+    data, status = fetch_json_raw("quests.json")
+    if status == 200:
+        return data
+    return {"main": {}, "side": {}}
+
+GLOBAL_QUESTS = fetch_quests()
 # ---------------------------
 # GitHub backend helpers (online)
 # ---------------------------
