@@ -159,16 +159,6 @@ MONSTERS = load_json("monsters.json", DEFAULT_MONSTERS)
 EVENTS = load_json("events.json", DEFAULT_EVENTS)
 DESCRIPTIONS = load_json("descriptions.json", DEFAULT_DESCRIPTIONS)
 CRAFTING = load_json("crafting.json", {})
-# --------------
-# Quests Backend
-# --------------
-def fetch_quests():
-    data, status = fetch_json_raw("quests.json")
-    if status == 200:
-        return data
-    return {"main": {}, "side": {}}
-
-GLOBAL_QUESTS = fetch_quests()
 # ---------------------------
 # GitHub backend helpers (online)
 # ---------------------------
@@ -274,6 +264,16 @@ def fetch_json_raw(path, timeout=8):
     if data is None:
         return [], status
     return data, 200
+# --------------
+# Quest Backend
+# --------------
+def fetch_quests():
+    data, status = fetch_json_raw("quests.json")
+    if status == 200:
+        return data
+    return {"main": {}, "side": {}}
+
+GLOBAL_QUESTS = fetch_quests()
 
 def check_github_token_valid():
     global ONLINE_MODE, GITHUB_TOKEN
