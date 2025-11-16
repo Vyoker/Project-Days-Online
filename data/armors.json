@@ -38,21 +38,28 @@
     "def": 30
     "bonus": {
       "atk_percent": 0,
-      "def_percent": 10,
+      "def_percent": 5,
       "dex_percent": 0
   },
   "Rompi Lv2": {
     "def": 40
     "bonus": {
       "atk_percent": 0,
-      "def_percent": 20,
+      "def_percent": 10,
       "dex_percent": 0
   },
   "Rompi Lv3": {
     "def": 50
     "bonus": {
       "atk_percent": 0,
-      "def_percent": 30,
+      "def_percent": 15,
+      "dex_percent": 0
+  },
+  "Armored Glacier": {
+    "def": 60
+    "bonus": {
+      "atk_percent": 0,
+      "def_percent": 50,
       "dex_percent": 0
   }
 }
