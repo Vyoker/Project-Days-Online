@@ -1,26 +1,58 @@
 {
   "Pakaian Lusuh": {
     "def": 5
+    "bonus": {
+      "atk_percent": 0,
+      "def_percent": 0,
+      "dex_percent": 1
   },
   "Kaos": {
     "def": 8
+    "bonus": {
+      "atk_percent": 0,
+      "def_percent": 0,
+      "dex_percent": 1
   },
   "Kaos Panjang": {
     "def": 10
+    "bonus": {
+      "atk_percent": 0,
+      "def_percent": 1,
+      "dex_percent": 1
   },
   "Sweater": {
     "def": 14
+    "bonus": {
+      "atk_percent": 0,
+      "def_percent": 1,
+      "dex_percent": 1
   },
   "Jaket": {
     "def": 20
+    "bonus": {
+      "atk_percent": 0,
+      "def_percent": 2,
+      "dex_percent": 1
   },
   "Rompi Lv1": {
     "def": 30
+    "bonus": {
+      "atk_percent": 0,
+      "def_percent": 10,
+      "dex_percent": 0
   },
   "Rompi Lv2": {
     "def": 40
+    "bonus": {
+      "atk_percent": 0,
+      "def_percent": 20,
+      "dex_percent": 0
   },
   "Rompi Lv3": {
     "def": 50
+    "bonus": {
+      "atk_percent": 0,
+      "def_percent": 30,
+      "dex_percent": 0
   }
 }
