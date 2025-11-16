@@ -33,6 +33,24 @@
       "desc": "Bawa Painkiller ke peneliti di Yogyakarta.",
       "requirements": {"items": {"Painkiller": 1}},
       "rewards": {"EXP": 150, "items": {"Ammo 9mm": 10}}
+    },
+    "S003": {
+      "name": "Pisau Glacier",
+      "desc": "Pisau yang sangat langka dan paling kuat dibuat dari gabungan pistol dan es bertabur diamond. ATK: 60, Bonus: ATK+50% DEX+50%.",
+      "requirements": {"items": {"Pisau": 1, "Pistol": 1, "Besi": 20, "Diamond": 10, "Es": 30}},
+      "rewards": {"EXP": 500, "items": {"Handmade Knife Glacier": 1}}
+    },
+    "S004": {
+      "name": "Pedang Glacier",
+      "desc": "Pedang yang sangat langka dan paling kuat dibuat dari gabungan besi dan es. ATK: 60, Bonus: ATK+50% DEX+50%.",
+      "requirements": {"items": {"Pedang": 1, "Besi": 20, "Diamond": 10, "Es": 50}},
+      "rewards": {"EXP": 500, "items": {"Sword of Glacier": 1}}
+    },
+    "S005": {
+      "name": "Armored Glacier",
+      "desc": "Pisau yang sangat langka dan paling kuat dibuat dari gabungan pistol dan es bertabur diamond. ATK: 60, Bonus: ATK+50% DEX+50%.",
+      "requirements": {"items": {"Rompi Lv1": 1, "Rompi Lv2": 1, "Rompi Lv3": 1, "Kulit": 10, "Es": 50}},
+      "rewards": {"EXP": 500, "items": {"Armored Glacier": 1}}
     }
   }
 }
