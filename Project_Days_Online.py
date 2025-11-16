@@ -268,7 +268,7 @@ def fetch_json_raw(path, timeout=8):
 # Quest Backend
 # --------------
 def fetch_quests():
-    data, status = fetch_json_raw("quests.json")
+    data, status = fetch_json_raw("data/quests.json")
     if status == 200:
         return data
     return {"main": {}, "side": {}}
