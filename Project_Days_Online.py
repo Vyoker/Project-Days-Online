@@ -1288,7 +1288,7 @@ def quests_menu(player):
                     q["main_active"] = MQ[code].get("next")
                     # Reward
                     reward = MQ[code]["rewards"]
-                    player["exp"] += reward["EXP"]
+                    player["exp"] += reward["exp"]
 
                     for item, qty in reward["items"].items():
                         player["inventory"][item] = player["inventory"].get(item, 0) + qty
@@ -1313,7 +1313,7 @@ def quests_menu(player):
                     q["main_active"] = MQ[code].get("next")
 
                     reward = MQ[code]["rewards"]
-                    player["exp"] += reward["EXP"]
+                    player["exp"] += reward["exp"]
 
                     for item, qty in reward["items"].items():
                         player["inventory"][item] = player["inventory"].get(item, 0) + qty
@@ -1357,7 +1357,7 @@ def quests_menu(player):
                     q["side_active"].remove(code)
 
                     reward = SQ[code]["rewards"]
-                    player["exp"] += reward["EXP"]
+                    player["exp"] += reward["exp"]
                     for item, qty in reward["items"].items():
                         player["inventory"][item] = player["inventory"].get(item, 0) + qty
 
