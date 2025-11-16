@@ -47,6 +47,22 @@
       "def_percent": 0,
       "dex_percent": 0
   },
+  "Handmade Knife Glacier": {
+    "type": "melee",
+    "atk": 50,
+    "bonus": {
+      "atk_percent": 50,
+      "def_percent": 0,
+      "dex_percent": 50
+  },
+  "Sword of Glacier": {
+    "type": "melee",
+    "atk": 60,
+    "bonus": {
+      "atk_percent": 60,
+      "def_percent": 0,
+      "dex_percent": 60
+  },
   "Pistol": {
     "type": "gun",
     "atk": 35,
