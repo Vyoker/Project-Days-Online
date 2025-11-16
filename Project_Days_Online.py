@@ -1,6 +1,4 @@
-# Project_Days_Online v2.6.5
-# Requires: pip install requests rich
-
+# Project_Days_Online v2.6.6
 import os, sys, time, random, json, base64, uuid, requests
 from rich.console import Console
 from rich.panel import Panel
@@ -884,7 +882,7 @@ def main_menu(player):
             console.print(Panel("🌐 Mode: [green]Online (Connected to GitHub)[/]", box=box.ROUNDED, style=HEADER_BG))
         else:
             console.print(Panel("📴 Mode: [red]Read-Only (Token tidak ditemukan / Invalid)[/]", box=box.ROUNDED, style=HEADER_BG))
-        console.print("\n1. Inventory\n2. Explore\n3. Travel\n4. Toko\n5. Chatting\n6. Exit (Save & Quit)\n")
+        console.print("\n1. Inventory\n2. Explore\n3. Travel\n4. Toko\n5. Chatting\n6. Quests\n7. Exit (Save & Quit)\n")
         choice = input("Pilih menu: ").strip()
         if choice == "1":
             slow("Membuka inventory...", 0.02)
@@ -912,6 +910,9 @@ def main_menu(player):
             else:
                 chat_menu(player)
         elif choice == "6":
+            slow("Membuka menu quests...", 0.02)
+            quests_menu(player)
+        elif choice == "7":
             save_game(player)
             slow("Sampai jumpa, survivor.", 0.02)
             time.sleep(0.6)
@@ -1148,6 +1149,91 @@ def crafting_menu(player):
         slow(f"+{exp_reward} EXP dari crafting!", 0.02)
         check_level_up(player)
     time.sleep(0.6)
+# ---------------------------
+# Quests
+# ---------------------------
+def quests_menu(player):
+    clear()
+    console.print(Panel(Text("🗒️ QUESTS 🗒️", style=HIGHLIGHT), box=box.DOUBLE, style=HEADER_BG))
+    # Pastikan struktur quest ada
+    if "quests" not in player:
+        player["quests"] = {
+            "main": [],
+            "side": [],
+            "completed": []
+        }
+
+    q = player["quests"]
+
+    console.print("Selesaikan Quest:\n", style=HIGHLIGHT)
+
+    console.print("Main:", style=HIGHLIGHT)
+    if q["main"]:
+        for m in q["main"]:
+            console.print(f"❎ {m}")
+    else:
+        console.print("❎ (Tidak ada misi)", style=HIGHLIGHT)
+
+    console.print("\nSide:", style=HIGHLIGHT)
+    if q["side"]:
+        for s in q["side"]:
+            console.print(f"❎ {s}")
+    else:
+        console.print("❎ (Tidak ada misi)", style=HIGHLIGHT)
+
+    console.print("\n_______________", style=HIGHLIGHT)
+    console.print("Quest Terselesaikan:", style=HIGHLIGHT)
+    if q["completed"]:
+        for c in q["completed"]:
+            console.print(f"✅ {c}")
+    else:
+        console.print("(Belum ada)", style=HIGHLIGHT)
+    console.print("_______________\n", style=HIGHLIGHT)
+
+    console.print("1. Lihat misi")
+    console.print("2. Ambil Misi")
+    console.print("3. Batalkan Misi")
+    console.print("4. Selesaikan Misi")
+    console.print("5. Kembali\n")
+
+    choice = input("Pilih: ").strip()
+
+    if choice == "1":
+        input("Tekan enter untuk kembali...")
+        return
+    elif choice == "2":
+        nama = input("Nama misi baru: ").strip()
+        tipe = input("Tipe (main/side): ").strip().lower()
+        if tipe not in ("main", "side"):
+            slow("Tipe tidak valid!", 0.02)
+            return
+        q[tipe].append(nama)
+        slow("Misi ditambahkan.", 0.02)
+        save_game(player)
+
+    elif choice == "3":
+        nama = input("Nama misi yang ingin dibatalkan: ").strip()
+        for k in ("main", "side"):
+            if nama in q[k]:
+                q[k].remove(nama)
+                slow("Misi dibatalkan.", 0.02)
+                save_game(player)
+                return
+        slow("Misi tidak ditemukan.", 0.02)
+
+    elif choice == "4":
+        nama = input("Nama misi yang selesai: ").strip()
+        for k in ("main", "side"):
+            if nama in q[k]:
+                q[k].remove(nama)
+                q["completed"].append(nama)
+                slow("Misi diselesaikan!", 0.02)
+                save_game(player)
+                return
+        slow("Misi tidak ditemukan.", 0.02)
+
+    elif choice == "5":
+        return
 # ---------------------------
 # Travel & Shop & Barter
 # ---------------------------
