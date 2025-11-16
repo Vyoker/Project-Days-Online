@@ -1586,12 +1586,20 @@ def battle_zombie(player, lokasi, reward_exp):
         console.print("1. Serang\n2. Gunakan Item\n3. Kabur\n")
         action = input("Pilih aksi: ").strip()
         if action == "1":
-            weapon_name = player.get("Weapon", "Tangan Kosong")
-            weapon_data = WEAPONS.get(weapon_name, {"type":"melee","atk":5})
-            base_atk_w = weapon_data.get("atk",5)
-            # atk increase per ATK stat: +2% per point
-            atk_bonus = base_atk_w * (player.get("atk",10) * 0.02)
-            total_damage = int(base_atk_w + atk_bonus)
+            weapon_name = player.get("weapon", "Tangan Kosong")
+            weapon_data = WEAPONS.get(weapon_name, {"type": "melee", "atk": 5})
+            base_atk_w = weapon_data.get("atk", 5)
+            atk_bonus = base_atk_w * (player.get("atk", 10) * 0.02)
+            # Bonus: dari weapon JSON
+            bonus_data = weapon_data.get("bonus", {})
+            bonus_atk_percent = bonus_data.get("atk_percent", 0)
+            percent_bonus = base_atk_w * (bonus_atk_percent / 100)
+            # Bonus: 2% per LEVEL khusus senjata gun
+            level_bonus = 0
+            if weapon_data.get("type") == "gun":
+                level_bonus = base_atk_w * ((player.get("level", 1) * 2) / 100)
+            # Total damage
+            total_damage = int(base_atk_w + atk_bonus + percent_bonus + level_bonus)
             if weapon_data.get("type") == "gun":
                 ammo_type = weapon_data.get("ammo")
                 if player["inventory"].get(ammo_type,0) <= 0:
