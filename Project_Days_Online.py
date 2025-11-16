@@ -1310,7 +1310,7 @@ def quests_menu(player):
                             del player["inventory"][item]
                     # Selesaikan
                     q["completed"].append(code)
-                    q["main_active"] = MQ[code"].get("next")
+                    q["main_active"] = MQ[code].get("next")
 
                     reward = MQ[code]["rewards"]
                     player["exp"] += reward["EXP"]
