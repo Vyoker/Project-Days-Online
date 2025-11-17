@@ -1,20 +1,28 @@
 {
-  "Jakarta": {
-    "type": "city"
-  },
-  "Bandung": {
-    "type": "mountain"
-  },
-  "Surabaya": {
-    "type": "coastal"
-  },
-  "Makassar": {
-    "type": "coastal"
-  },
-  "Yogyakarta": {
-    "type": "city"
-  },
-  "Denpasar": {
-    "type": "coastal"
-  }
+  "Jakarta": { "type": "city" },
+  "Bandung": { "type": "mountain" },
+  "Surabaya": { "type": "coastal" },
+  "Yogyakarta": { "type": "city" },
+  "Semarang": { "type": "city" },
+  "Medan": { "type": "city" },
+  "Palembang": { "type": "city" },
+  "Makassar": { "type": "coastal" },
+  "Denpasar": { "type": "coastal" },
+  "Balikpapan": { "type": "coastal" },
+  "Malang": { "type": "mountain" },
+  "Pontianak": { "type": "city" },
+  "Manado": { "type": "coastal" },
+  "Padang": { "type": "coastal" },
+  "Samarinda": { "type": "city" },
+  "Banjarmasin": { "type": "city" },
+  "Cirebon": { "type": "city" },
+  "Tasikmalaya": { "type": "mountain" },
+  "Solo": { "type": "mountain" },
+  "Bogor": { "type": "mountain" },
+  "Batam": { "type": "coastal" },
+  "Pekanbaru": { "type": "city" },
+  "Kupang": { "type": "city" },
+  "Jayapura": { "type": "city" },
+  "Mataram": { "type": "city" },
+  "Hutan Pinggiran": { "type": "wild" }
 }
