@@ -1,32 +1,32 @@
 {
   "Zombie": {
-    "hp_mod": 1.0,
-    "atk_mod": 1.0,
-    "def_mod": 1.0,
+    "hp_mod": 0.7,
+    "atk_mod": 0.7,
+    "def_mod": 0.7,
     "dodge": 0
   },
   "Zombie Atlit": {
-    "hp_mod": 0.7,
+    "hp_mod": 0.8,
     "atk_mod": 0.8,
     "def_mod": 0.8,
-    "dodge": 35
+    "dodge": 10
   },
   "Zombie Berotot": {
-    "hp_mod": 1.35,
-    "atk_mod": 1.3,
-    "def_mod": 1.0,
-    "dodge": 0
+    "hp_mod": 1.0,
+    "atk_mod": 1.2,
+    "def_mod": 1.1,
+    "dodge": 2
   },
   "Zombie Armored": {
-    "hp_mod": 1.3,
+    "hp_mod": 1.2,
     "atk_mod": 1.1,
-    "def_mod": 1.4,
-    "dodge": 0
+    "def_mod": 1.2,
+    "dodge": 2
   },
   "Zombie Mutant": {
-    "hp_mod": 1.4,
-    "atk_mod": 1.3,
-    "def_mod": 1.25,
-    "dodge": 15
+    "hp_mod": 1.3,
+    "atk_mod": 1.1,
+    "def_mod": 1.2,
+    "dodge": 10
   }
 }
