@@ -1,0 +1,62 @@
+{
+  "default": {
+    "chance": 70,
+    "items": {
+      "Ammo 9mm": [1, 2],
+      "Perban": [1, 2],
+      "Minuman": [1, 2]
+    }
+  },
+  "monsters": {
+    "Zombie": {
+      "chance": 50,
+      "items": {
+        "Ammo 9mm": [2, 4],
+        "Ammo 12mm": [1, 2],
+        "Ammo 7.2mm": [1, 2],
+        "Minuman": [1, 2],
+        "Makanan": [1, 2]
+     }
+   },
+   "Zombie Atlit": {
+     "chance": 50,
+     "items": {
+       "Ammo 9mm": [4, 8],
+       "Ammo 12mm": [2, 4],
+       "Ammo 7.2mm": [2, 3],
+       "Minuman": [2, 3],
+       "Makanan": [2, 3]
+     }
+   },
+   "Zombie Berotot": {
+     "chance": 50,
+     "items": {
+       "Ammo 9mm": [5, 9],
+       "Ammo 12mm": [3, 5],
+       "Ammo 7.2mm": [3, 5],
+       "Minuman": [3, 4],
+       "Makanan": [3, 4]
+     }
+   },
+   "Armored Zombie": {
+     "chance": 50,
+      "items": {
+        "Ammo 9mm": [8, 12],
+        "Ammo 12mm": [4, 7],
+        "Ammo 7.2mm": [3, 5],
+        "Minuman": [4, 5],
+        "Makanan": [4, 5]
+     }
+   },
+   "Armored Zombie": {
+     "chance": 50,
+      "items": {
+        "Ammo 9mm": [10, 15],
+        "Ammo 12mm": [5, 8],
+        "Ammo 7.2mm": [4, 6],
+        "Minuman": [5, 6],
+        "Makanan": [5, 6]
+      }
+    }
+  }
+}
