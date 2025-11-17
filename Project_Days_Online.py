@@ -1,4 +1,4 @@
-# Project_Days_Online v2.6.6
+# Project_Days_Online v2.6.7
 import os, sys, time, random, json, base64, uuid, requests
 from rich.console import Console
 from rich.panel import Panel
@@ -159,6 +159,8 @@ MONSTERS = load_json("monsters.json", DEFAULT_MONSTERS)
 EVENTS = load_json("events.json", DEFAULT_EVENTS)
 DESCRIPTIONS = load_json("descriptions.json", DEFAULT_DESCRIPTIONS)
 CRAFTING = load_json("crafting.json", {})
+CITIES = load_json("cities.json", {})
+SHOP = load_json("shop.json", {})
 # ---------------------------
 # GitHub backend helpers (online)
 # ---------------------------
@@ -1372,13 +1374,7 @@ def travel_menu(player):
         slow("Perjalanan dibatalkan.", 0.02)
         time.sleep(0.6)
         return
-    kota_indonesia = [
-        "Jakarta", "Bandung", "Surabaya", "Yogyakarta", "Semarang", "Medan",
-        "Palembang", "Makassar", "Denpasar", "Balikpapan", "Malang", "Pontianak",
-        "Manado", "Padang", "Samarinda", "Banjarmasin", "Cirebon", "Tasikmalaya",
-        "Solo", "Bogor", "Batam", "Pekanbaru", "Kupang", "Jayapura", "Mataram",
-        "Hutan Pinggiran"
-    ]
+    kota_indonesia = list(CITIES.keys())
     tujuan = random.choice([k for k in kota_indonesia if k != player["location"]])
     biaya = random.randint(25, 50)
     if player["energy"] < biaya:
@@ -1413,26 +1409,23 @@ def shop_menu(player):
 
 def barter_shop(player):
     clear()
-    slow(f"\nKamu memasuki kios barter di {player['location']}...\n", 0.02)
+    slow(f"\nKamu memasuki kios barter di {player['location']}.\n", 0.02)
     time.sleep(0.6)
-    kota_pesisir = ["Surabaya", "Makassar", "Denpasar", "Balikpapan", "Manado", "Batam", "Padang"]
-    kota_gunung  = ["Bandung", "Malang", "Bogor", "Tasikmalaya", "Solo"]
-    kota_besar   = ["Jakarta", "Yogyakarta", "Semarang", "Medan", "Palembang", "Samarinda"]
-    if player["location"] in kota_pesisir:
-        stok_pedagang = ["Makanan", "Minuman", "Painkiller", "Kayu", "Pisau"]
-    elif player["location"] in kota_gunung:
-        stok_pedagang = ["Kayu", "Batu", "Daun", "Painkiller", "Tombak"]
-    elif player["location"] in kota_besar:
-        stok_pedagang = ["Ammo 9mm", "Makanan", "Perban", "Minuman", "Kain"]
-    else:
-        stok_pedagang = ["Kain", "Painkiller", "Batu", "Kayu", "Minuman"]
+    # Ambil tipe kota dari cities.json
+    city_type = CITIES.get(player["location"], {}).get("type", "wild")
+    # Ambil stok pedagang dari shop.json
+    stok_pedagang = SHOP.get(city_type, SHOP.get("wild", []))
     while True:
         clear()
-        console.print(Panel(Text(f"🤝  KIOS BARTER — {player['location']}", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
+        console.print(Panel(Text(f"🤝  KIOS BARTER — {player['location']}", style=HIGHLIGHT),
+                             box=box.ROUNDED, style=HEADER_BG))
+        # Tampilkan stok pedagang
         for i, item in enumerate(stok_pedagang, 1):
             console.print(f"{i}. {item}")
         console.print("6. Kembali")
-        console.print(Panel(Text("Inventory kamu:", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
+        # Inventory player
+        console.print(Panel(Text("Inventory kamu:", style=HIGHLIGHT),
+                             box=box.ROUNDED, style=HEADER_BG))
         if player["inventory"]:
             for k, v in player["inventory"].items():
                 console.print(f"- {k} ({v})")
@@ -1451,20 +1444,23 @@ def barter_shop(player):
             slow("Kamu tidak punya barang untuk ditukar!", 0.02)
             time.sleep(0.6)
             continue
-        console.print(Panel(Text("Barang kamu untuk barter:", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
-        for i, (item, jumlah) in enumerate(player["inventory"].items(), 1):
+        # Pilih barang untuk barter
+        console.print(Panel(Text("Barang kamu untuk barter:", style=HIGHLIGHT),
+                             box=box.ROUNDED, style=HEADER_BG))
+        inv_list = list(player["inventory"].items())
+        for i, (item, jumlah) in enumerate(inv_list, 1):
             console.print(f"{i}. {item} ({jumlah})")
         pilih_barter = input("Pilih barangmu untuk ditukar: ").strip()
-        if not pilih_barter.isdigit() or int(pilih_barter) < 1 or int(pilih_barter) > len(player["inventory"]):
+        if not pilih_barter.isdigit() or int(pilih_barter) < 1 or int(pilih_barter) > len(inv_list):
             slow("Pilihan tidak valid.", 0.02)
             continue
-        item_player = list(player["inventory"].keys())[int(pilih_barter) - 1]
-        # barter exchange: remove 1 of player's item only, not all
+        item_player = inv_list[int(pilih_barter) - 1][0]
+        # Sistem barter (70% sukses)
         if random.randint(1, 100) <= 70:
             if player["inventory"].get(item_player, 0) > 1:
                 player["inventory"][item_player] -= 1
             else:
-                player["inventory"].pop(item_player, None)
+                del player["inventory"][item_player]
             player["inventory"][item_toko] = player["inventory"].get(item_toko, 0) + 1
             slow(f"Barter berhasil! Kamu menukar 1x {item_player} dengan 1x {item_toko}.", 0.02)
         else:
