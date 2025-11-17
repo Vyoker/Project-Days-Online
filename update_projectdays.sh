@@ -1,23 +1,24 @@
 #!/usr/bin/env bash
-# PROJECT DAYS — ONLINE SIMPLE UPDATER v2.5
+# PROJECT DAYS — ONLINE SIMPLE UPDATER v2.6.7
 
 REPO_RAW="https://raw.githubusercontent.com/Vyoker/Project-Days-Online/main"
 GAME_DIR="$HOME/Project_Days"
 DATA_DIR="$GAME_DIR/data"
 FILES=(
   "Project_Days_Online.py"
+  "installer_projectdays.sh"
   "data/items.json"
   "data/weapons.json"
   "data/armors.json"
   "data/monsters.json"
   "data/events.json"
   "data/descriptions.json"
-  "installer_projectdays.sh"
   "data/cities.json"
   "data/crafting.json"
   "data/dialogs.json"
   "data/settings.json"
   "data/quests.json"
+  "data/drop.json"
 )
 
 # === Warna Gaya Apocalypse ===
@@ -53,9 +54,9 @@ draw_panel() {
 
 # === Start ===
 clear
-echo -e "${BROWN_BG}${TAN_FG}┌──────────────────────────────────────────────────────────────┐${RESET}"
+echo -e "${BROWN_BG}${TAN_FG}┌───────────────────────────────────────────────┐${RESET}"
 echo -e "${BROWN_BG}${TAN_FG}│ ☣  PROJECT DAYS — ONLINE: DATA UPDATER (FAST MODE) ☣ │${RESET}"
-echo -e "${BROWN_BG}${TAN_FG}└──────────────────────────────────────────────────────────────┘${RESET}"
+echo -e "${BROWN_BG}${TAN_FG}└───────────────────────────────────────────────┘${RESET}"
 echo ""
 
 echo -e "${TAN_FG}📦 Menyiapkan direktori dan dependensi...${RESET}"
