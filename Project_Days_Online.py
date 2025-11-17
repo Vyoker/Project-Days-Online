@@ -292,9 +292,9 @@ def check_github_token_valid():
         pass
     ONLINE_MODE = False
     return False, f"Token gagal/akses repo."
-# ---------------------------
+# ---------------------
 # Ban & Events helpers
-# ---------------------------
+# ---------------------
 def fetch_banlist():
     data, status = fetch_json_raw(BANLIST_PATH)
     if status != 200:
@@ -344,9 +344,9 @@ def fetch_and_claim_events_for_player(player):
 def append_event(to_uuid, item, qty=1, sender="SYSTEM"):
     entry = {"to": to_uuid, "item": item, "qty": int(qty), "from": sender, "time": time.strftime("%H:%M:%S")}
     return safe_append_and_put(EVENTS_PATH, entry)
-# ---------------------------
+# ---------------
 # Chat functions
-# ---------------------------
+# ---------------
 MAX_CHAT_SIZE_KB = 500
 
 def send_chat_message(player, msg):
@@ -377,9 +377,9 @@ def show_chat_preview(limit=20):
     if status != 200:
         return []
     return data[-limit:]
-# ---------------------------
+# -------
 # Market
-# ---------------------------
+# -------
 def _load_market_local():
     # baca market lokal di data/market.json (dibuat jika belum ada)
     return load_json("market.json", [])
@@ -466,13 +466,11 @@ def market_sell(player):
             raise ValueError
     except Exception:
         slow("❌ Kuantiti tidak valid.", 0.02); time.sleep(0.6); return
-
     # konfirmasi (opsional singkat)
     slow(f"\nPosting listing: {player.get('name')} menawarkan {offer_qty}x {offer} ⇒ {want_qty}x {want}", 0.01)
     confirm = input("Ketik 'y' untuk konfirmasi: ").strip().lower()
     if confirm != "y":
         slow("Dibatalkan.", 0.02); time.sleep(0.6); return
-
     # kurangi inventory player
     player["inventory"][offer] -= offer_qty
     if player["inventory"][offer] <= 0:
@@ -487,12 +485,10 @@ def market_sell(player):
         "time": time.strftime("%H:%M:%S"),
         "loc": player.get("location","")
     }
-
     # simpan di local
     market_list = _load_market_local()
     market_list.append(entry)
     _save_market_local(market_list)
-
     # push ke github bila online
     if ONLINE_MODE:
         ok, info = _push_market_to_github(market_list)
@@ -521,7 +517,6 @@ def market_buy(player):
     market_list = market_refresh()
     if not market_list:
         slow("Marketplace kosong.", 0.02); time.sleep(0.6); return
-
     # tampilkan market
     console.print("\nCurrent listings:\n")
     for m in market_list:
@@ -536,18 +531,15 @@ def market_buy(player):
             raise ValueError
     except Exception:
         slow("❌ Kuantiti tidak valid.", 0.02); time.sleep(0.6); return
-
     # cari listing yang match exactly want + want_qty
     matches = [m for m in market_list if m.get("want") == desired and int(m.get("want_qty",0)) == desired_qty]
 
     if not matches:
         slow("❌ Tidak ada listing yang cocok (harus match nama & qty persis).", 0.02); time.sleep(0.8); return
-
     # tampilkan matches (penjual dan apa yang mereka minta)
     slow("\nListing cocok:")
     for i, m in enumerate(matches, start=1):
         slow(f"{i}. {m.get('seller')} meminta {m.get('offer_qty')}x {m.get('offer')} untuk {m.get('want_qty')}x {m.get('want')}")
-
     # Pilih seller berdasarkan nomor (lebih aman daripada nama karena bisa multiple)
     try:
         pick = int(input("Pilih nomor listing untuk melakukan barter: ").strip())
@@ -559,18 +551,15 @@ def market_buy(player):
     chosen = matches[pick - 1]
     needed_offer_item = chosen.get("offer")
     needed_offer_qty = int(chosen.get("offer_qty", 0))
-
     # cek apakah buyer punya needed_offer_item dengan jumlah yang tepat (karena kita pilih exact rule)
     if player["inventory"].get(needed_offer_item, 0) < needed_offer_qty:
         slow(f"❌ Kamu tidak punya {needed_offer_qty}x {needed_offer_item} untuk barter.", 0.02); time.sleep(0.6); return
-
     # Lakukan barter: kurangi buyer offer, tambahkan buyer want
     player["inventory"][needed_offer_item] -= needed_offer_qty
     if player["inventory"][needed_offer_item] <= 0:
         del player["inventory"][needed_offer_item]
     # tambahkan yang diterima
     player["inventory"][desired] = player["inventory"].get(desired, 0) + desired_qty
-
     # Hapus listing dari market_list (persist perubahan)
     market_full = _load_market_local()
     # hapus entry yang identik (seller, offer, offer_qty, want, want_qty, time)
@@ -579,7 +568,6 @@ def market_buy(player):
         return all(str(a.get(k)) == str(b.get(k)) for k in keys)
     new_market = [m for m in market_full if not same_entry(m, chosen)]
     _save_market_local(new_market)
-
     # push change ke github jika online; jika gagal, simpan lokal tetap berlaku
     if ONLINE_MODE:
         ok, info = _push_market_to_github(new_market)
@@ -636,9 +624,9 @@ def market_menu(player):
             slow("Command tidak dikenal. Gunakan: refresh | sell | buy | exit", 0.02)
             time.sleep(0.8)
             continue
-# ---------------------------
+# ------------
 # Save / Load
-# ---------------------------
+# ------------
 def save_game(player):
     try:
         loading_animation("📂 Menyimpan")
@@ -649,9 +637,9 @@ def save_game(player):
         time.sleep(0.6)
     except Exception as e:
         slow(f"Gagal menyimpan game: {e}", 0.01)
-# ==============================================
-# ✅ Auto-Fix Save Lama (Versi Bersih Lowercase)
-# ==============================================
+# ===================
+# Auto-Fix Save Lama
+# ===================
 def load_game_interactive():
     files = [f for f in os.listdir(SAVE_FOLDER) if f.endswith('.json')]
     clear()
@@ -699,11 +687,11 @@ def load_game_interactive():
         for k, v in defaults.items():
             if k not in data:
                 data[k] = v
-        # 🔹 Hapus key uppercase lama agar bersih
+        # Hapus key uppercase lama agar bersih
         for k in list(data.keys()):
             if not k.islower():
                 del data[k]
-        # 💾 Simpan ulang hasil perbaikan
+        # Simpan ulang hasil perbaikan
         with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
 
@@ -715,9 +703,9 @@ def load_game_interactive():
         slow(f"❌ Gagal memuat save: {e}", 0.02)
         time.sleep(1)
         return None
-# ==============================================
-# ✅ Fungsi Event Otomatis (GitHub JSON)
-# ==============================================
+# ===================================
+# Fungsi Event Otomatis (GitHub JSON)
+# ===================================
 def check_event(player):
     today = datetime.now().strftime("%d-%m")
     url = "https://raw.githubusercontent.com/Vyoker/Project-Days-Online/main/events.json"
@@ -823,9 +811,9 @@ def check_level_up(player):
         player['energy'] = player['max_energy']
         slow(f"\n🎉 Naik level! Sekarang kamu level {player['level']}", 0.02)
         time.sleep(0.8)
-# ---------------------------
+# -----------
 # UI / Menus
-# ---------------------------
+# -----------
 def show_title():
     clear()
     status_text = "🌐 Online (Connected to GitHub)" if ONLINE_MODE else "📴 Read-Only (Token tidak ditemukan / Invalid)"
@@ -939,9 +927,9 @@ def ensure_player_quests(player):
             "side_active": [],        # list of quest code: ["S001"]
             "completed": []           # list of completed quest codes
         }
-# ---------------------------
-# Inventory & crafting (use JSON data)
-# ---------------------------
+# --------------------
+# Inventory & crafting
+# --------------------
 def inventory_menu(player):
     while True:
         clear()
@@ -1167,9 +1155,9 @@ def crafting_menu(player):
         slow(f"+{exp_reward} EXP dari crafting!", 0.02)
         check_level_up(player)
     time.sleep(0.6)
-# ---------------------------
+# -------
 # Quests
-# ---------------------------
+# -------
 def quests_menu(player):
     ensure_player_quests(player)
     q = player["quests"]
@@ -1237,9 +1225,9 @@ def quests_menu(player):
 
         input("\nTekan Enter...")
         return
-    # ====================================
+    # ===============================
     # 2. AMBIL MISI UTAMA (berurutan)
-    # ====================================
+    # ===============================
     elif pilih == "2":
         if q["main_active"]:
             slow("❌ Kamu sudah punya misi utama aktif.", 0.02)
@@ -1272,9 +1260,9 @@ def quests_menu(player):
         save_game(player)
         slow(f"📌 Misi '{SQ[kode]['name']}' diambil!", 0.02)
         return
-    # ====================================
+    # ========================
     # 4. CEK & SELESAIKAN MISI
-    # ====================================
+    # ========================
     elif pilih == "4":
         # ----- Misi Utama -----
         if q["main_active"]:
@@ -1367,14 +1355,14 @@ def quests_menu(player):
 
         slow("❌ Tidak ada misi yang bisa diselesaikan saat ini.", 0.02)
         return
-    # ================
+    # ===========
     # 5. KEMBALI
-    # ================
+    # ===========
     elif pilih == "5":
         return
-# ---------------------------
+# -----------------------
 # Travel & Shop & Barter
-# ---------------------------
+# -----------------------
 def travel_menu(player):
     clear()
     console.print(Panel(Text("🚗  TRAVEL MENU", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
@@ -1482,9 +1470,9 @@ def barter_shop(player):
         else:
             slow(f"Pedagang menolak menukar {item_player}.", 0.02)
         time.sleep(0.6)
-# ---------------------------
-# Explore & Looting (uses JSON)
-# ---------------------------
+# -------------------
+# Explore & Looting
+# -------------------
 def explore_menu(player):
     while True:
         clear()
@@ -1651,9 +1639,9 @@ def battle_zombie(player, lokasi, reward_exp):
             slow("\nKamu tumbang... Game Over!\n", 0.03)
             time.sleep(2)
             sys.exit()
-# ---------------------------
+# ----------
 # Drop item
-# ---------------------------
+# ----------
 def drop_item(player):
     if random.randint(1,100) <= 50:
         possible = ["Ammo 9mm", "Perban", "Minuman"]
@@ -1662,9 +1650,9 @@ def drop_item(player):
         player["inventory"][item] = player["inventory"].get(item,0) + jumlah
         slow(f"Zombie menjatuhkan {jumlah}x {item}!", 0.02)
         time.sleep(0.6)
-# ---------------------------
+# -----------------
 # Chatting & Admin
-# ---------------------------
+# -----------------
 def chat_menu(player):
     clear()
     slow("📻 RADIO SURVIVOR — Chat Global (Ketik /exit untuk keluar)\n", 0.01)
@@ -1775,9 +1763,9 @@ def chat_menu(player):
             time.sleep(0.6)
             display_chats()
             continue
-        # ===================================================
+        # ============
         # NORMAL CHAT
-        # ===================================================
+        # ============
         ok, info = send_chat_message(player, msg)
         if ok:
             slow("✅ Pesan terkirim.", 0.01)
@@ -1786,9 +1774,9 @@ def chat_menu(player):
 
         time.sleep(1)
         display_chats()
-# ---------------------------
+# -----------
 # Main entry
-# ---------------------------
+# -----------
 if __name__ == "__main__":
     try:
         if os.path.exists(ADMIN_FILE):
