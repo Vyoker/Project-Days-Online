@@ -130,85 +130,15 @@ DEFAULT_DESCRIPTIONS = {
 # ---------------------------
 # JSON loader / saver (hybrid)
 # ---------------------------
-def load_json(filename, default):
-    path = os.path.join(DATA_PATH, filename)
-    try:
-        if not os.path.exists(path):
-            with open(path, "w", encoding="utf-8") as f:
-                json.dump(default, f, indent=2, ensure_ascii=False)
-            return default
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception as e:
-        try:
-            with open(path, "w", encoding="utf-8") as f:
-                json.dump(default, f, indent=2, ensure_ascii=False)
-        except:
-            pass
-        return default
-
-def save_json(filename, data):
-    path = os.path.join(DATA_PATH, filename)
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-# load data sets (hybrid)
-# =========================
-#  ONLINE/OFFLINE JSON LOADER
-# =========================
-# ITEMS
-ITEMS_ONLINE, status = fetch_json("data/items.json")
-if status == 200:
-    ITEMS = ITEMS_ONLINE
-else:
-    ITEMS = load_json("items.json", DEFAULT_ITEMS)
-# WEAPONS
-WEAPONS_ONLINE, status = fetch_json("data/weapons.json")
-if status == 200:
-    WEAPONS = WEAPONS_ONLINE
-else:
-    WEAPONS = load_json("weapons.json", DEFAULT_WEAPONS)
-# ARMORS
-ARMORS_ONLINE, status = fetch_json("data/armors.json")
-if status == 200:
-    ARMORS = ARMORS_ONLINE
-else:
-    ARMORS = load_json("armors.json", DEFAULT_ARMORS)
-# MONSTERS
-MONSTERS_ONLINE, status = fetch_json("data/monsters.json")
-if status == 200:
-    MONSTERS = MONSTERS_ONLINE
-else:
-    MONSTERS = load_json("monsters.json", DEFAULT_MONSTERS)
-# EVENTS
-EVENTS_ONLINE, status = fetch_json("data/events.json")
-if status == 200:
-    EVENTS = EVENTS_ONLINE
-else:
-    EVENTS = load_json("events.json", DEFAULT_EVENTS)
-# DESCRIPTIONS
-DESCRIPTIONS_ONLINE, status = fetch_json("data/descriptions.json")
-if status == 200:
-    DESCRIPTIONS = DESCRIPTIONS_ONLINE
-else:
-    DESCRIPTIONS = load_json("descriptions.json", DEFAULT_DESCRIPTIONS)
-# CRAFTING
-CRAFTING_ONLINE, status = fetch_json("data/crafting.json")
-if status == 200:
-    CRAFTING = CRAFTING_ONLINE
-else:
-    CRAFTING = load_json("crafting.json", {})
-# CITIES
-CITIES_ONLINE, status = fetch_json("data/cities.json")
-if status == 200:
-    CITIES = CITIES_ONLINE
-else:
-    CITIES = load_json("cities.json", {})
-# SHOP
-SHOP_ONLINE, status = fetch_json("data/shop.json")
-if status == 200:
-    SHOP = SHOP_ONLINE
-else:
-    SHOP = load_json("shop.json", {})
+ITEMS = load_json("items.json", DEFAULT_ITEMS)
+WEAPONS = load_json("weapons.json", DEFAULT_WEAPONS)
+ARMORS = load_json("armors.json", DEFAULT_ARMORS)
+MONSTERS = load_json("monsters.json", DEFAULT_MONSTERS)
+EVENTS = load_json("events.json", DEFAULT_EVENTS)
+DESCRIPTIONS = load_json("descriptions.json", DEFAULT_DESCRIPTIONS)
+CRAFTING = load_json("crafting.json", {})
+CITIES = load_json("cities.json", {})
+SHOP = load_json("shop.json", {})
 # ---------------------------
 # GitHub backend helpers (online)
 # ---------------------------
