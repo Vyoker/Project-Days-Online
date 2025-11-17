@@ -1,0 +1,6 @@
+{
+  "coastal": ["Makanan", "Minuman", "Painkiller", "Kayu", "Pisau"],
+  "mountain": ["Kayu", "Batu", "Daun", "Painkiller", "Tombak"],
+  "city": ["Ammo 9mm", "Makanan", "Perban", "Minuman", "Kain"],
+  "wild": ["Kain", "Painkiller", "Batu", "Kayu", "Minuman"]
+}
