@@ -1638,14 +1638,24 @@ def battle_zombie(player, lokasi, reward_exp):
 # ----------
 # Drop item
 # ----------
-def drop_item(player):
-    if random.randint(1,100) <= 50:
-        possible = ["Ammo 9mm", "Perban", "Minuman"]
-        item = random.choice(possible)
-        jumlah = random.randint(1,2)
-        player["inventory"][item] = player["inventory"].get(item,0) + jumlah
-        slow(f"Zombie menjatuhkan {jumlah}x {item}!", 0.02)
-        time.sleep(0.6)
+def drop_item(player, monster_name="default"):
+    data = DROP
+    # Kalau monster punya loot khusus
+    loot = data.get("monsters", {}).get(monster_name, data.get("default", {}))
+    chance = loot.get("chance", 0)
+    if random.randint(1, 100) > chance:
+        return  # tidak drop apa-apa
+    items = loot.get("items", {})
+    if not items:
+        return
+    # Pilih item random
+    item = random.choice(list(items.keys()))
+    min_q, max_q = items[item]
+    qty = random.randint(min_q, max_q)
+    # Tambahkan ke inventory
+    player["inventory"][item] = player["inventory"].get(item, 0) + qty
+    slow(f"🎁 Zombie menjatuhkan {qty}x {item}!", 0.02)
+    time.sleep(0.6)
 # -----------------
 # Chatting & Admin
 # -----------------
@@ -1663,7 +1673,7 @@ def chat_menu(player):
                 qty = ev.get("qty", 1)
                 slow(f"🎁 Kamu menerima {qty}x {item} dari {ev.get('from','SYSTEM')}!", 0.01)
             save_game(player)
-    
+            
         chats = show_chat_preview(limit=20)
         clear()
         slow("📻 RADIO SURVIVOR — Chat Global\n", 0.01)
@@ -1695,7 +1705,6 @@ def chat_menu(player):
                 admin_uuid_local = open(ADMIN_FILE,"r", encoding="utf-8").read().strip()
             except:
                 admin_uuid_local = None
-
         player_uuid = player.get("uuid") or player.get("UUID")
         is_admin = (player_uuid == admin_uuid_local)
         # ===================================================
