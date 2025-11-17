@@ -113,6 +113,16 @@
       "atk": 25,
       "type": "melee"
     },
+    "Handmade Knife Glacier": {
+      "desc": "Pisau yang sangat langka dan paling kuat dibuat dari gabungan pistol dan es bertabur diamond. Bonus ATK+50%, DEX+50%",
+      "atk": 50,
+      "type": "melee"
+    },
+    "Sword of Glacier": {
+      "desc": "Pedang yang sangat langka dan paling kuat dibuat dari gabungan besi dan es. Bonus ATK+60%, DEX+60%",
+      "atk": 60,
+      "type": "melee"
+    },
     "Pistol": {
       "desc": "Senjata api ringan yang masih bisa ditemukan di pos polisi terbengkalai.",
       "atk": 35,
@@ -171,6 +181,10 @@
     "Rompi Lv3": {
       "desc": "Rompi militer asli, sulit ditemukan tapi hampir tidak bisa ditembus gigitan.",
       "def": 50
+    },
+    "Armored Glacier": {
+      "desc": "Armor yang dibuat oleh pengrajin misterius yang menggambungkan rompi terkuat dengan es. Bonus DEF+50%",
+      "def": 60
     }
   }
 }
