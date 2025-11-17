@@ -152,15 +152,63 @@ def save_json(filename, data):
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 # load data sets (hybrid)
-ITEMS = load_json("items.json", DEFAULT_ITEMS)
-WEAPONS = load_json("weapons.json", DEFAULT_WEAPONS)
-ARMORS = load_json("armors.json", DEFAULT_ARMORS)
-MONSTERS = load_json("monsters.json", DEFAULT_MONSTERS)
-EVENTS = load_json("events.json", DEFAULT_EVENTS)
-DESCRIPTIONS = load_json("descriptions.json", DEFAULT_DESCRIPTIONS)
-CRAFTING = load_json("crafting.json", {})
-CITIES = load_json("cities.json", {})
-SHOP = load_json("shop.json", {})
+# =========================
+#  ONLINE/OFFLINE JSON LOADER
+# =========================
+# ITEMS
+ITEMS_ONLINE, status = fetch_json_raw("data/items.json")
+if status == 200:
+    ITEMS = ITEMS_ONLINE
+else:
+    ITEMS = load_json("items.json", DEFAULT_ITEMS)
+# WEAPONS
+WEAPONS_ONLINE, status = fetch_json_raw("data/weapons.json")
+if status == 200:
+    WEAPONS = WEAPONS_ONLINE
+else:
+    WEAPONS = load_json("weapons.json", DEFAULT_WEAPONS)
+# ARMORS
+ARMORS_ONLINE, status = fetch_json_raw("data/armors.json")
+if status == 200:
+    ARMORS = ARMORS_ONLINE
+else:
+    ARMORS = load_json("armors.json", DEFAULT_ARMORS)
+# MONSTERS
+MONSTERS_ONLINE, status = fetch_json_raw("data/monsters.json")
+if status == 200:
+    MONSTERS = MONSTERS_ONLINE
+else:
+    MONSTERS = load_json("monsters.json", DEFAULT_MONSTERS)
+# EVENTS
+EVENTS_ONLINE, status = fetch_json_raw("data/events.json")
+if status == 200:
+    EVENTS = EVENTS_ONLINE
+else:
+    EVENTS = load_json("events.json", DEFAULT_EVENTS)
+# DESCRIPTIONS
+DESCRIPTIONS_ONLINE, status = fetch_json_raw("data/descriptions.json")
+if status == 200:
+    DESCRIPTIONS = DESCRIPTIONS_ONLINE
+else:
+    DESCRIPTIONS = load_json("descriptions.json", DEFAULT_DESCRIPTIONS)
+# CRAFTING
+CRAFTING_ONLINE, status = fetch_json_raw("data/crafting.json")
+if status == 200:
+    CRAFTING = CRAFTING_ONLINE
+else:
+    CRAFTING = load_json("crafting.json", {})
+# CITIES
+CITIES_ONLINE, status = fetch_json_raw("data/cities.json")
+if status == 200:
+    CITIES = CITIES_ONLINE
+else:
+    CITIES = load_json("cities.json", {})
+# SHOP
+SHOP_ONLINE, status = fetch_json_raw("data/shop.json")
+if status == 200:
+    SHOP = SHOP_ONLINE
+else:
+    SHOP = load_json("shop.json", {})
 # ---------------------------
 # GitHub backend helpers (online)
 # ---------------------------
