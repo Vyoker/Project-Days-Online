@@ -975,8 +975,10 @@ def lihat_deskripsi(player):
 def gunakan_item(player):
     clear()
     slow("Pilih item yang ingin digunakan:\n", 0.01)
+
     inventory = player.get("inventory", {})
     valid_items = {k: v for k, v in inventory.items() if v > 0}
+
     if not valid_items:
         slow("Inventory kosong.", 0.01)
         return
@@ -984,7 +986,9 @@ def gunakan_item(player):
     items_list = list(valid_items.keys())
     for i, item in enumerate(items_list, 1):
         console.print(f"[cyan]{i}.[/cyan] {item} [cyan]({inventory[item]})[/cyan]")
+
     pilihan = input("\nNomor item: ").strip()
+
     if not pilihan.isdigit():
         slow("Input tidak valid.", 0.01)
         return
@@ -995,42 +999,73 @@ def gunakan_item(player):
         return
 
     item = items_list[pilihan - 1]
-    # Consumable
+
+    # ==========================
+    # 1. Consumable (heal/food)
+    # ==========================
     if item in ITEMS:
-    data = ITEMS[item]
-    heal = data.get("heal", 0) + data.get("hp", 0)
-    energy = data.get("energy", 0)
-    player["hp"] = min(player["max_hp"], player["hp"] + heal)
-    player["energy"] = min(player["max_energy"], player["energy"] + energy)
-    player["inventory"][item] -= 1
-    if player["inventory"][item] <= 0:
-        del player["inventory"][item]
-    slow(f"Kamu menggunakan {item}.", 0.01)
-    return
-    # Weapon
-    elif item in WEAPONS:
-    old_weapon = player.get("weapon", None)
-    if old_weapon and old_weapon in WEAPONS:
-        player["inventory"][old_weapon] = player["inventory"].get(old_weapon, 0) + 1
-    player["weapon"] = item
-    player["inventory"][item] -= 1
-    if player["inventory"][item] <= 0:
-        del player["inventory"][item]
-    hitung_stat_final(player)
-    slow(f"Kamu memasang weapon: {item}", 0.01)
-    return
-    # Armor
-    elif item in ARMORS:
-    old_armor = player.get("armor", None)
-    if old_armor and old_armor in ARMORS:
-        player["inventory"][old_armor] = player["inventory"].get(old_armor, 0) + 1
-    player["armor"] = item
-    player["inventory"][item] -= 1
-    if player["inventory"][item] <= 0:
-        del player["inventory"][item]
-    hitung_stat_final(player)
-    slow(f"Kamu memakai armor: {item}", 0.01)
-    return
+        data = ITEMS[item]
+        heal = data.get("heal", data.get("hp", 0))
+        energy = data.get("energy", 0)
+
+        if heal > 0:
+            player["hp"] = min(player["max_hp"], player["hp"] + heal)
+
+        if energy > 0:
+            player["energy"] = min(player["max_energy"], player["energy"] + energy)
+
+        inventory[item] -= 1
+        if inventory[item] <= 0:
+            del inventory[item]
+
+        slow(f"Kamu menggunakan {item}.", 0.01)
+        return
+
+    # ==========================
+    # 2. Weapon equip
+    # ==========================
+    if item in WEAPONS:
+        # kalau ada weapon lama → kembali ke inventory
+        old = player.get("weapon", None)
+        if old and old in WEAPONS:
+            inventory[old] = inventory.get(old, 0) + 1
+
+        # pasang weapon baru
+        player["weapon"] = item
+
+        # kurangi dari inventory
+        inventory[item] -= 1
+        if inventory[item] <= 0:
+            del inventory[item]
+
+        hitung_stat_final(player)
+        slow(f"Kamu memasang weapon: {item}", 0.01)
+        return
+
+    # ==========================
+    # 3. Armor equip
+    # ==========================
+    if item in ARMORS:
+        # kalau ada armor lama → kembali ke inventory
+        old = player.get("armor", None)
+        if old and old in ARMORS:
+            inventory[old] = inventory.get(old, 0) + 1
+
+        # pasang armor baru
+        player["armor"] = item
+
+        # kurangi dari inventory
+        inventory[item] -= 1
+        if inventory[item] <= 0:
+            del inventory[item]
+
+        hitung_stat_final(player)
+        slow(f"Kamu memakai armor: {item}", 0.01)
+        return
+
+    # ==========================
+    # 4. Jika bukan semua di atas
+    # ==========================
     else:
         slow("Item ini tidak bisa digunakan.", 0.01)
         return
