@@ -58,15 +58,19 @@ def load_json(filename, default=None):
         # Jika error baca → return default kosong
         return default if default is not None else {}
 
-ITEMS = load_json("items.json", {})
-WEAPONS = load_json("weapons.json", {})
 ARMORS = load_json("armors.json", {})
-MONSTERS = load_json("monsters.json", {})
-EVENTS = load_json("events.json", {})
-DESCRIPTIONS = load_json("descriptions.json", {})
-CRAFTING = load_json("crafting.json", {})
 CITIES = load_json("cities.json", {})
+CRAFTING = load_json("crafting.json", {})
+DESCRIPTIONS = load_json("descriptions.json", {})
+DIALOGS = load_json("dialogs.json", {})
+DROP = load_jwon("drop.json", {})
+EVENTS = load_json("events.json", {})
+ITEMS = load_json("items.json", {})
+MONSTERS = load_json("monsters.json", {})
+QUESTS = load_json("quests.json", {})
+SETTING = load_json("settings.json", {})
 SHOP = load_json("shop.json", {})
+WEAPONS = load_json("weapons.json", {})
 # ---------------------------
 # GitHub backend helpers (online)
 # ---------------------------
@@ -926,132 +930,120 @@ def lihat_deskripsi(player):
     except:
         slow("Input tidak valid.", 0.02)
         time.sleep(0.6)
-        
+                
 def gunakan_item(player):
-    # LIST ITEM
-    valid_items = {k: v for k, v in player.get("inventory", {}).items() if v > 0}
-    if not valid_items:
-        slow("Inventory kosong.", 0.02)
-        time.sleep(1)
-        return
     clear()
-    console.print(Panel(Text("Pilih item yang ingin digunakan:", style=HIGHLIGHT),
-                         box=box.ROUNDED, style=HEADER_BG))
-    
-    items = list(valid_items.items())
-    for i, (nama, jumlah) in enumerate(items, start=1):
-        console.print(f"{i}. {nama} ({jumlah})")
-    console.print()
-    try:
-        choice = int(input("Nomor item: ").strip())
-        if choice < 1 or choice > len(items):
-            raise ValueError
-        item, jumlah = items[choice - 1]
-    except Exception:
-        slow("Pilihan tidak valid.", 0.02)
+    slow("Pilih item yang ingin digunakan:\n", 0.01)
+
+    inventory = player.get("inventory", {})
+    valid_items = {k: v for k, v in inventory.items() if v > 0}
+
+    if not valid_items:
+        slow("Tidak ada item dalam inventory.", 0.01)
         return
-    # 1. CONSUMABLES
-    item_def = ITEMS.get(item)
-    if item_def:
-        t = item_def.get("type")
-        if t == "heal":
-            heal = item_def.get("heal", 0)
-            player["hp"] = min(player["max_hp"], player["hp"] + heal)
-            slow(f"Kamu menggunakan {item}. HP +{heal}", 0.01)
-        elif t == "drink":
-            energy = item_def.get("energy", 0)
-            player["energy"] = min(player["max_energy"], player["energy"] + energy)
-            slow(f"Kamu menggunakan {item}. Energy +{energy}", 0.01)
-        elif t == "food":
-            heal = item_def.get("hp", 0)
-            energy = item_def.get("energy", 0)
-            player["hp"] = min(player["max_hp"], player["hp"] + heal)
-            player["energy"] = min(player["max_energy"], player["energy"] + energy)
-            slow(f"Kamu menggunakan {item}. HP +{heal}, Energy +{energy}", 0.01)
-        else:
-            slow("Item ini tidak bisa digunakan langsung.", 0.01)
-            return
-    # 2. WEAPONS (gun / melee) + BONUS SUPPORT
+    # Tampilkan daftar item
+    items_list = list(valid_items.keys())
+    for i, item in enumerate(items_list, 1):
+        slow(f"{i}. {item} ({inventory[item]})", 0.01)
+
+    pilihan = input("\nNomor item: ").strip()
+
+    if not pilihan.isdigit():
+        slow("Input tidak valid.", 0.01)
+        return
+
+    pilihan = int(pilihan)
+    if pilihan < 1 or pilihan > len(items_list):
+        slow("Pilihan di luar jangkauan.", 0.01)
+        return
+
+    item = items_list[pilihan - 1]
+    # ① ITEM KONSUMSI (ITEMS)
+    if item in ITEMS:
+        efek = ITEMS[item]
+        heal = efek.get("heal", 0)
+        energy = efek.get("energy", 0)
+
+        player["hp"] = min(player["max_hp"], player["hp"] + heal)
+        player["energy"] = min(player["max_energy"], player["energy"] + energy)
+
+        inventory[item] -= 1
+        slow(f"Kamu menggunakan {item}.", 0.01)
+        return
+    # ② ITEM WEAPON
     elif item in WEAPONS:
         w = WEAPONS[item]
-        # Ammo check untuk gun
-        if w.get("type") == "gun":
-            ammo_t = w.get("ammo")
-            if player["inventory"].get(ammo_t, 0) <= 0:
-                slow(f"Kamu tidak punya peluru {ammo_t}! Tidak bisa equip {item}.", 0.01)
-                return
-        # Hapus bonus senjata lama
+        # Lepas senjata lama
         old = player.get("weapon_bonus", {})
+        player["atk"] -= old.get("base_atk", 0)
         player["atk"] -= old.get("atk_flat", 0)
         player["dex"] -= old.get("dex_flat", 0)
-        # Pasang weapon baru
-        player["weapon"] = item
+        # Pasang senjata baru
+        base_atk = w.get("atk", 0)
         bonus = w.get("bonus", {})
+
         atk_p = bonus.get("atk_percent", 0)
         dex_p = bonus.get("dex_percent", 0)
+
         atk_flat = bonus.get("atk", 0)
         dex_flat = bonus.get("dex", 0)
-        # Apply bonus %
-        player["atk"] = int(player["atk"] * (1 + atk_p/100))
-        player["dex"] = int(player["dex"] * (1 + dex_p/100))
-        # Apply bonus flat
+        # Terapkan base ATK dulu
+        player["atk"] += base_atk
+        # Terapkan bonus percent
+        player["atk"] = int(player["atk"] * (1 + atk_p / 100))
+        player["dex"] = int(player["dex"] * (1 + dex_p / 100))
+        # Terapkan bonus flat
         player["atk"] += atk_flat
         player["dex"] += dex_flat
-        # Simpan bonus aktif
+        # Simpan bonus untuk unequip selanjutnya
         player["weapon_bonus"] = {
-            "atk_percent": atk_p,
-            "dex_percent": dex_p,
+            "base_atk": base_atk,
             "atk_flat": atk_flat,
-            "dex_flat": dex_flat
+            "dex_flat": dex_flat,
         }
-        slow(f"Kamu kini menggunakan senjata: {item}!", 0.01)
-    # 3. ARMORS + BONUS SUPPORT
+
+        player["weapon"] = item
+        slow(f"Kamu memakai senjata: {item}", 0.01)
+        return
+    # ③ ITEM ARMOR
     elif item in ARMORS:
         a = ARMORS[item]
-        # Hapus bonus armor lama
+        # Lepas armor lama
         old = player.get("armor_bonus", {})
+        player["def"] -= old.get("base_def", 0)
         player["def"] -= old.get("def_flat", 0)
-        player["atk"] -= old.get("atk_flat", 0)
         player["dex"] -= old.get("dex_flat", 0)
         # Pasang armor baru
-        player["armor"] = item
         base_def = a.get("def", 0)
-        player["def"] += base_def
         bonus = a.get("bonus", {})
-        atk_p = bonus.get("atk_percent", 0)
+
         def_p = bonus.get("def_percent", 0)
         dex_p = bonus.get("dex_percent", 0)
-        atk_flat = bonus.get("atk", 0)
+
         def_flat = bonus.get("def", 0)
         dex_flat = bonus.get("dex", 0)
+        # Terapkan base DEF
+        player["def"] += base_def
         # Bonus percent
-        player["atk"] = int(player["atk"] * (1 + atk_p/100))
-        player["def"] = int(player["def"] * (1 + def_p/100))
-        player["dex"] = int(player["dex"] * (1 + dex_p/100))
+        player["def"] = int(player["def"] * (1 + def_p / 100))
+        player["dex"] = int(player["dex"] * (1 + dex_p / 100))
         # Bonus flat
-        player["atk"] += atk_flat
         player["def"] += def_flat
         player["dex"] += dex_flat
-        # Simpan bonus aktif
+        # Simpan untuk unequip
         player["armor_bonus"] = {
-            "atk_percent": atk_p,
-            "def_percent": def_p,
-            "dex_percent": dex_p,
-            "atk_flat": atk_flat,
+            "base_def": base_def,
             "def_flat": def_flat,
-            "dex_flat": dex_flat
+            "dex_flat": dex_flat,
         }
-        slow(f"Kamu kini memakai armor: {item}!", 0.01)
-    # 4. Item tidak valid
+
+        player["armor"] = item
+        slow(f"Kamu memakai armor: {item}", 0.01)
+        return
+    # ④ SELAIN ITU = TIDAK BISA DIPAKAI
     else:
         slow("Item ini tidak bisa digunakan langsung.", 0.01)
         return
-    # KURANGI JUMLAH (hanya consumable)
-    if item_def:
-        player["inventory"][item] -= 1
-        if player["inventory"][item] <= 0:
-            del player["inventory"][item]
-    time.sleep(0.6)
 
 def buang_item(player):
     valid_items = {k: v for k, v in player.get("inventory", {}).items() if v > 0}
