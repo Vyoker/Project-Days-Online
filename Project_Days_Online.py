@@ -997,26 +997,40 @@ def gunakan_item(player):
     item = items_list[pilihan - 1]
     # Consumable
     if item in ITEMS:
-        efek = ITEMS[item]
-        heal = efek.get("heal", 0)
-        energy = efek.get("energy", 0)
-        player["hp"] = min(player["max_hp"], player["hp"] + heal)
-        player["energy"] = min(player["max_energy"], player["energy"] + energy)
-        inventory[item] -= 1
-        slow(f"Kamu menggunakan {item}.", 0.01)
-        return
+    data = ITEMS[item]
+    heal = data.get("heal", 0) + data.get("hp", 0)
+    energy = data.get("energy", 0)
+    player["hp"] = min(player["max_hp"], player["hp"] + heal)
+    player["energy"] = min(player["max_energy"], player["energy"] + energy)
+    player["inventory"][item] -= 1
+    if player["inventory"][item] <= 0:
+        del player["inventory"][item]
+    slow(f"Kamu menggunakan {item}.", 0.01)
+    return
     # Weapon
     elif item in WEAPONS:
-        player["weapon"] = item
-        hitung_stat_final(player)
-        slow(f"Kamu memasang weapon: {item}", 0.01)
-        return
+    old_weapon = player.get("weapon", None)
+    if old_weapon and old_weapon in WEAPONS:
+        player["inventory"][old_weapon] = player["inventory"].get(old_weapon, 0) + 1
+    player["weapon"] = item
+    player["inventory"][item] -= 1
+    if player["inventory"][item] <= 0:
+        del player["inventory"][item]
+    hitung_stat_final(player)
+    slow(f"Kamu memasang weapon: {item}", 0.01)
+    return
     # Armor
     elif item in ARMORS:
-        player["armor"] = item
-        hitung_stat_final(player)
-        slow(f"Kamu memakai armor: {item}", 0.01)
-        return
+    old_armor = player.get("armor", None)
+    if old_armor and old_armor in ARMORS:
+        player["inventory"][old_armor] = player["inventory"].get(old_armor, 0) + 1
+    player["armor"] = item
+    player["inventory"][item] -= 1
+    if player["inventory"][item] <= 0:
+        del player["inventory"][item]
+    hitung_stat_final(player)
+    slow(f"Kamu memakai armor: {item}", 0.01)
+    return
     else:
         slow("Item ini tidak bisa digunakan.", 0.01)
         return
@@ -1484,60 +1498,63 @@ def dapat_item(player, lokasi, reward_exp):
 # Battle (uses WEAPONS, MONSTERS, ARMORS, player stats)
 # ---------------------------
 def battle_zombie(player, lokasi, reward_exp):
+    # Pastikan stat final sudah dihitung
+    hitung_stat_final(player)
     loading_animation(f"☣ Zombie mendekat di {lokasi}")
     zname = random.choice(list(MONSTERS.keys()))
     ztype = MONSTERS.get(zname, {})
-    base_hp = random.randint(30, 70)
-    base_atk = random.randint(5, 15)
-    base_def = random.randint(0, 10)
     zombie = {
         "name": zname,
-        "hp": int(base_hp * ztype.get("hp_mod",1.0)),
-        "atk": int(base_atk * ztype.get("atk_mod",1.0)),
-        "def": int(base_def * ztype.get("def_mod",1.0)),
-        "dodge": ztype.get("dodge",0),
+        "hp": random.randint(40, 80) * ztype.get("hp_mod", 1.0),
+        "atk": random.randint(6, 14) * ztype.get("atk_mod", 1.0),
+        "def": random.randint(0, 8) * ztype.get("def_mod", 1.0),
+        "dodge": ztype.get("dodge", 0),
         "exp": reward_exp + random.randint(5, 15)
     }
-    slow(f"Kamu bertemu dengan {zombie['name']}!\n", 0.02)
-    slow(f"• HP: {zombie['hp']} | ATK: {zombie['atk']} | DEF: {zombie['def']} | DODGE: {zombie['dodge']}%\n", 0.01)
+    slow(f"Kamu bertemu dengan {zombie['name']}!", 0.02)
+    slow(f"• HP: {int(zombie['hp'])} | ATK: {int(zombie['atk'])} | DEF: {int(zombie['def'])} | DODGE: {zombie['dodge']}%\n", 0.01)
     time.sleep(0.6)
     while player["hp"] > 0 and zombie["hp"] > 0:
-        console.print(Panel(Text(f"⚔️  {zombie['name']} — ❤️  {zombie['hp']}", style=HIGHLIGHT), box=box.SQUARE, style=HEADER_BG))
+        # PANEL STATUS PERTARUNGAN
+        console.print(Panel(Text(f"⚔️  {zombie['name']} — ❤️  {int(zombie['hp'])}", style=HIGHLIGHT), box=box.SQUARE, style=HEADER_BG))
         console.print(Panel(Text(f"🧍  {player['name']} — ❤️  {player['hp']} / {player['max_hp']}", style=HIGHLIGHT), box=box.SQUARE, style=HEADER_BG))
         console.print("1. Serang\n2. Gunakan Item\n3. Kabur\n")
         action = input("Pilih aksi: ").strip()
+        #  1. SERANG
         if action == "1":
+            hitung_stat_final(player)  # update lagi jika habis pakai item
+            # FINAL ATTACK PLAYER
+            player_atk = player.get("atk_final", 10)
+            # cek senjata
             weapon_name = player.get("weapon", "Tangan Kosong")
-            weapon_data = WEAPONS.get(weapon_name, {"type": "melee", "atk": 5})
-            base_atk_w = weapon_data.get("atk", 5)
-            atk_bonus = base_atk_w * (player.get("atk", 10) * 0.02)
-            # Bonus: dari weapon JSON
-            bonus_data = weapon_data.get("bonus", {})
-            bonus_atk_percent = bonus_data.get("atk_percent", 0)
-            percent_bonus = base_atk_w * (bonus_atk_percent / 100)
-            # Bonus: 2% per LEVEL khusus senjata gun
-            level_bonus = 0
+            weapon_data = WEAPONS.get(weapon_name, {})
+            # bonus percent dari senjata sudah dihitung di atk_final → tidak perlu diulang
+            base_weapon_atk = weapon_data.get("atk", 5)
+            # damage dasar
+            damage = int(player_atk)
+            # tipe gun perlu peluru
             if weapon_data.get("type") == "gun":
-                level_bonus = base_atk_w * ((player.get("level", 1) * 2) / 100)
-            # Total damage
-            total_damage = int(base_atk_w + atk_bonus + percent_bonus + level_bonus)
-            if weapon_data.get("type") == "gun":
-                ammo_type = weapon_data.get("ammo")
-                if player["inventory"].get(ammo_type,0) <= 0:
-                    slow(f"Tidak ada peluru {ammo_type}! Serangan gagal!", 0.02)
-                    total_damage = 0
+                ammo = weapon_data.get("ammo")
+                if player["inventory"].get(ammo, 0) <= 0:
+                    slow(f"Tidak ada peluru {ammo}! Serangan gagal!", 0.02)
+                    damage = 0
                 else:
-                    player["inventory"][ammo_type] -= 1
-                    slow(f"🔫 {weapon_name} digunakan, peluru {ammo_type} tersisa {player['inventory'].get(ammo_type,0)}", 0.02)
-            if random.randint(1,100) <= zombie.get("dodge",0):
+                    player["inventory"][ammo] -= 1
+                    slow(f"🔫 {weapon_name} digunakan, tersisa {player['inventory'].get(ammo,0)} peluru", 0.02)
+            # DODGE zombie
+            if random.randint(1, 100) <= zombie["dodge"]:
                 slow(f"{zombie['name']} berhasil menghindar!", 0.02)
             else:
-                dmg_after_def = max(1, int(total_damage - zombie.get("def",0)))
+                # DEF zombie dikurangkan
+                dmg_after_def = max(1, damage - int(zombie["def"]))
                 zombie["hp"] -= dmg_after_def
                 slow(f"Kamu menyerang dan memberi {dmg_after_def} damage!", 0.02)
+        #  2. GUNAKAN ITEM
         elif action == "2":
             gunakan_item(player)
+            hitung_stat_final(player)
             continue
+        #  3. KABUR
         elif action == "3":
             if random.random() < 0.5:
                 slow("Kamu berhasil kabur!", 0.02)
@@ -1547,21 +1564,24 @@ def battle_zombie(player, lokasi, reward_exp):
         else:
             slow("Pilihan tidak valid.", 0.02)
             continue
-        # zombie attack
+        #  ZOMBIE MENYERANG
         if zombie["hp"] > 0:
-            if random.randint(1,100) <= player.get("dex",0):
+            hitung_stat_final(player)
+            # cek dodge player dari dex_final
+            if random.randint(1,100) <= player.get("dex_final", 0):
                 slow("Kamu berhasil menghindar serangan!", 0.02)
             else:
-                base_dmg_zombie = zombie["atk"]
-                # DEF reduces percentage: 1.5% per DEF point of incoming damage
-                def_reduction = base_dmg_zombie * (player.get("def",0) * 0.015)
-                total_zombie_dmg = max(1, int(base_dmg_zombie - def_reduction))
-                player["hp"] -= total_zombie_dmg
-                slow(f"{zombie['name']} menyerangmu dan memberi {total_zombie_dmg} damage!", 0.02)
-        # result
+                zombie_atk = int(zombie["atk"])
+                def_points = player.get("def_final", 0)
+                # tiap DEF mengurangi 1.5% serangan
+                reduction = zombie_atk * (def_points * 0.015)
+                final_dmg = max(1, int(zombie_atk - reduction))
+                player["hp"] -= final_dmg
+                slow(f"{zombie['name']} menyerangmu dan memberi {final_dmg} damage!", 0.02)
+        #  HASIL
         if zombie["hp"] <= 0:
             slow(f"\n{zombie['name']} dikalahkan!", 0.03)
-            gained_exp = zombie["exp"]
+            gained_exp = int(zombie["exp"])
             player["exp"] += gained_exp
             slow(f"Kamu mendapat {gained_exp} EXP!", 0.02)
             drop_item(player)
