@@ -22,7 +22,7 @@
   },
   "Bolu": {
     "type": "food",
-    "hp": 25
+    "hp": 25,
     "energy": 30
   },
   "Minuman": {
