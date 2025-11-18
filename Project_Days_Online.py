@@ -44,98 +44,26 @@ def loading_animation(message="Loading", duration=1.2, speed=0.25):
         time.sleep(speed)
         i += 1
 # ---------------------------
-# Default data (used if JSON missing or corrupt)
-# ---------------------------
-DEFAULT_ITEMS = {
-  "Perban": {"type": "heal", "heal": 25},
-  "Herbal": {"type": "heal", "heal": 15},
-  "Painkiller": {"type": "heal", "heal": 35},
-  "Medkit": {"type": "heal", "heal": 50},
-  "Makanan": {"type": "food", "hp": 10, "energy": 30},
-  "Minuman": {"type": "drink", "energy": 20},
-  "Kayu": {"type": "material"},
-  "Batu": {"type": "material"},
-  "Daun": {"type": "material"}
-}
-
-DEFAULT_WEAPONS = {
-  "Tangan Kosong": {"type": "melee", "atk": 5},
-  "Pisau": {"type": "melee", "atk": 8},
-  "Palu": {"type": "melee", "atk": 12},
-  "Tombak": {"type": "melee", "atk": 16},
-  "Kampak": {"type": "melee", "atk": 20},
-  "Pedang": {"type": "melee", "atk": 25},
-  "Pistol": {"type": "gun", "atk": 35, "ammo": "Ammo 9mm"},
-  "Shotgun": {"type": "gun", "atk": 55, "ammo": "Ammo 12mm"},
-  "Sniper": {"type": "gun", "atk": 95, "ammo": "Ammo 7.2mm"},
-  "Senapan Serbu": {"type": "gun", "atk": 60, "ammo": "Ammo 7.2mm"}
-}
-
-DEFAULT_ARMORS = {
-  "Pakaian Lusuh": {"def": 5},
-  "Kaos": {"def": 8},
-  "Kaos Panjang": {"def": 10},
-  "Sweater": {"def": 14},
-  "Jaket": {"def": 20},
-  "Rompi Lv1": {"def": 30},
-  "Rompi Lv2": {"def": 40},
-  "Rompi Lv3": {"def": 50}
-}
-
-DEFAULT_MONSTERS = {
-  "Zombie": {"hp_mod": 1.0, "atk_mod": 1.0, "def_mod": 1.0, "dodge": 0},
-  "Zombie Atlit": {"hp_mod": 0.7, "atk_mod": 0.8, "def_mod": 0.8, "dodge": 35},
-  "Zombie Berotot": {"hp_mod": 1.35, "atk_mod": 1.3, "def_mod": 1.0, "dodge": 0},
-  "Zombie Armored": {"hp_mod": 1.3, "atk_mod": 1.1, "def_mod": 1.4, "dodge": 0},
-  "Zombie Mutant": {"hp_mod": 1.4, "atk_mod": 1.3, "def_mod": 1.25, "dodge": 15}
-}
-
-DEFAULT_EVENTS = []
-
-DEFAULT_DESCRIPTIONS = {
-  "items": {
-    "Perban": {"desc": "Kain steril untuk menghentikan pendarahan ringan.", "hp": 25, "energy": 0},
-    "Herbal": {"desc": "Ramuan alami, menyembuhkan luka kecil.", "hp": 15, "energy": 5},
-    "Painkiller": {"desc": "Obat pereda nyeri, pulihkan sebagian HP.", "hp": 35, "energy": -5},
-    "Medkit": {"desc": "Kotak medis lengkap untuk situasi kritis.", "hp": 50, "energy": 0},
-    "Makanan": {"desc": "Bekal penting, menambah HP dan Energy.", "hp": 10, "energy": 30},
-    "Minuman": {"desc": "Air bersih, mengembalikan Energy.", "hp": 0, "energy": 20},
-    "Kayu": {"desc": "Bahan pembuatan alat dan senjata.", "hp": 0, "energy": 0},
-    "Batu": {"desc": "Material keras untuk crafting sederhana.", "hp": 0, "energy": 0},
-    "Daun": {"desc": "Bahan herbal untuk ramuan.", "hp": 0, "energy": 0}
-  },
-  "weapons": {
-    "Tangan Kosong": {"desc": "Serangan dasar tanpa senjata.", "atk": 5, "type": "melee"},
-    "Pisau": {"desc": "Senjata tajam ringan, efektif untuk serangan cepat.", "atk": 8, "type": "melee"},
-    "Palu": {"desc": "Alat berat untuk menghancurkan zombie.", "atk": 12, "type": "melee"},
-    "Tombak": {"desc": "Senjata jarak menengah untuk menjaga jarak.", "atk": 16, "type": "melee"},
-    "Kampak": {"desc": "Alat serbaguna, damage tinggi.", "atk": 20, "type": "melee"},
-    "Pedang": {"desc": "Senjata seimbang antara kekuatan dan kecepatan.", "atk": 25, "type": "melee"},
-    "Pistol": {"desc": "Senjata api ringan, akurat.", "atk": 35, "ammo": "Ammo 9mm", "type": "gun"},
-    "Shotgun": {"desc": "Senjata jarak dekat, damage besar.", "atk": 55, "ammo": "Ammo 12mm", "type": "gun"},
-    "Sniper": {"desc": "Senjata jarak jauh dengan damage tinggi.", "atk": 95, "ammo": "Ammo 7.2mm", "type": "gun"},
-    "Senapan Serbu": {"desc": "Senjata otomatis cocok untuk jarak menengah.", "atk": 60, "ammo": "Ammo 7.2mm", "type": "gun"}
-  },
-  "armors": {
-    "Pakaian Lusuh": {"desc": "Pakaian seadanya, perlindungan minimal.", "def": 5},
-    "Kaos": {"desc": "Baju sederhana, perlindungan sedikit lebih baik.", "def": 8},
-    "Kaos Panjang": {"desc": "Melindungi lebih banyak bagian tubuh.", "def": 10},
-    "Sweater": {"desc": "Pakaian hangat dan sedikit tebal.", "def": 14},
-    "Jaket": {"desc": "Perlindungan lumayan terhadap serangan ringan.", "def": 20},
-    "Rompi Lv1": {"desc": "Rompi pelindung dasar.", "def": 30},
-    "Rompi Lv2": {"desc": "Rompi taktis dengan perlindungan ekstra.", "def": 40},
-    "Rompi Lv3": {"desc": "Rompi militer tingkat tinggi.", "def": 50}
-  }
-}
-# ---------------------------
 # JSON loader / saver (hybrid)
 # ---------------------------
-ITEMS = load_json("items.json", DEFAULT_ITEMS)
-WEAPONS = load_json("weapons.json", DEFAULT_WEAPONS)
-ARMORS = load_json("armors.json", DEFAULT_ARMORS)
-MONSTERS = load_json("monsters.json", DEFAULT_MONSTERS)
-EVENTS = load_json("events.json", DEFAULT_EVENTS)
-DESCRIPTIONS = load_json("descriptions.json", DEFAULT_DESCRIPTIONS)
+def load_json(filename, default=None):
+    path = os.path.join(DATA_PATH, filename)
+    try:
+        if not os.path.exists(path):
+            # File tidak ada → return default kosong
+            return default if default is not None else {}
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except:
+        # Jika error baca → return default kosong
+        return default if default is not None else {}
+
+ITEMS = load_json("items.json", {})
+WEAPONS = load_json("weapons.json", {})
+ARMORS = load_json("armors.json", {})
+MONSTERS = load_json("monsters.json", {})
+EVENTS = load_json("events.json", {})
+DESCRIPTIONS = load_json("descriptions.json", {})
 CRAFTING = load_json("crafting.json", {})
 CITIES = load_json("cities.json", {})
 SHOP = load_json("shop.json", {})
