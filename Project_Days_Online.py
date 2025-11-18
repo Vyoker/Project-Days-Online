@@ -71,6 +71,35 @@ QUESTS = load_json("quests.json", {})
 SETTING = load_json("settings.json", {})
 SHOP = load_json("shop.json", {})
 WEAPONS = load_json("weapons.json", {})
+
+def hitung_stat_final(player):
+    base_atk = player.get("base_atk", player.get("atk", 10))
+    base_def = player.get("base_def", player.get("def", 5))
+    base_dex = player.get("base_dex", player.get("dex", 3))
+    # Weapon
+    wname = player.get("weapon", None)
+    weapon = WEAPONS.get(wname, {"atk": 0, "bonus": {}})
+    w_flat_atk = weapon.get("atk", 0)
+    wb = weapon.get("bonus", {})
+
+    atk = base_atk + w_flat_atk + wb.get("atk", 0)
+    dex = base_dex + wb.get("dex", 0)
+    atk += int(atk * (wb.get("atk_percent", 0) / 100))
+    dex += int(dex * (wb.get("dex_percent", 0) / 100))
+    # Armor
+    aname = player.get("armor", None)
+    armor = ARMORS.get(aname, {"def": 0, "bonus": {}})
+    a_flat_def = armor.get("def", 0)
+    ab = armor.get("bonus", {})
+
+    defense = base_def + a_flat_def + ab.get("def", 0)
+    dex += ab.get("dex", 0)
+    defense += int(defense * (ab.get("def_percent", 0) / 100))
+    dex += int(dex * (ab.get("dex_percent", 0) / 100))
+
+    player["atk_final"] = atk
+    player["def_final"] = defense
+    player["dex_final"] = dex
 # ---------------------------
 # GitHub backend helpers (online)
 # ---------------------------
@@ -756,16 +785,28 @@ def show_title():
 
 def tampil_status(player):
     clear()
+    # Hitung stat final sebelum ditampilkan
+    hitung_stat_final(player)
     table = Table.grid(expand=True)
     table.add_column(ratio=2)
     table.add_column(ratio=3)
-    stats = (f"🔰 Level: {player.get('level',1)}  | EXP: {player.get('exp',0)}/{player.get('exp_to_next',100)}\n"
-             f"❤️ HP: {player.get('hp',100)}/{player.get('max_hp',100)}  | ⚡ Energy: {player.get('energy',100)}/{player.get('max_energy',100)}\n"
-             f"🗡️ ATK: {player.get('atk',10)}  | 🛡️ DEF: {player.get('def',5)}  | 🎯 DEX: {player.get('dex',3)}")
-    table.add_row(Panel(Text(f"🧍  Nama: {player.get('name','Survivor')}", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG),
-                  Panel(Text(stats, style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
+    stats = (
+        f"🔰 Level: {player.get('level',1)}  | EXP: {player.get('exp',0)}/{player.get('exp_to_next',100)}\n"
+        f"❤️ HP: {player.get('hp',100)}/{player.get('max_hp',100)}  | ⚡ Energy: {player.get('energy',100)}/{player.get('max_energy',100)}\n"
+        f"🗡️ ATK: {player.get('atk_final',10)}  | 🛡️ DEF: {player.get('def_final',5)}  | 🎯 DEX: {player.get('dex_final',3)}"
+    )
+    table.add_row(
+        Panel(Text(f"🧍  Nama: {player.get('name','Survivor')}", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG),
+        Panel(Text(stats, style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG)
+    )
     console.print(table)
-    console.print(Panel(Text(f"⚙️ Weapon: {player.get('weapon','Tangan Kosong')}    🧥 Armor: {player.get('armor','Pakaian Lusuh')}", style=HIGHLIGHT), box=box.ROUNDED, style=HEADER_BG))
+    console.print(
+        Panel(
+            Text(f"⚙️ Weapon: {player.get('weapon','Tangan Kosong')}    🧥 Armor: {player.get('armor','Pakaian Lusuh')}", style=HIGHLIGHT),
+            box=box.ROUNDED,
+            style=HEADER_BG
+        )
+    )
 
 def check_event(player):
     import requests, datetime, json
@@ -934,115 +975,50 @@ def lihat_deskripsi(player):
 def gunakan_item(player):
     clear()
     slow("Pilih item yang ingin digunakan:\n", 0.01)
-
     inventory = player.get("inventory", {})
     valid_items = {k: v for k, v in inventory.items() if v > 0}
-
     if not valid_items:
-        slow("Tidak ada item dalam inventory.", 0.01)
+        slow("Inventory kosong.", 0.01)
         return
-    # Tampilkan daftar item
+
     items_list = list(valid_items.keys())
     for i, item in enumerate(items_list, 1):
-        slow(f"{i}. {item} ({inventory[item]})", 0.01)
-
+        console.print(f"[cyan]{i}.[/cyan] {item} [cyan]({inventory[item]})[/cyan]")
     pilihan = input("\nNomor item: ").strip()
-
     if not pilihan.isdigit():
         slow("Input tidak valid.", 0.01)
         return
 
     pilihan = int(pilihan)
     if pilihan < 1 or pilihan > len(items_list):
-        slow("Pilihan di luar jangkauan.", 0.01)
+        slow("Pilihan tidak valid.", 0.01)
         return
 
     item = items_list[pilihan - 1]
-    # ① ITEM KONSUMSI (ITEMS)
+    # Consumable
     if item in ITEMS:
         efek = ITEMS[item]
         heal = efek.get("heal", 0)
         energy = efek.get("energy", 0)
-
         player["hp"] = min(player["max_hp"], player["hp"] + heal)
         player["energy"] = min(player["max_energy"], player["energy"] + energy)
-
         inventory[item] -= 1
         slow(f"Kamu menggunakan {item}.", 0.01)
         return
-    # ② ITEM WEAPON
+    # Weapon
     elif item in WEAPONS:
-        w = WEAPONS[item]
-        # Lepas senjata lama
-        old = player.get("weapon_bonus", {})
-        player["atk"] -= old.get("base_atk", 0)
-        player["atk"] -= old.get("atk_flat", 0)
-        player["dex"] -= old.get("dex_flat", 0)
-        # Pasang senjata baru
-        base_atk = w.get("atk", 0)
-        bonus = w.get("bonus", {})
-
-        atk_p = bonus.get("atk_percent", 0)
-        dex_p = bonus.get("dex_percent", 0)
-
-        atk_flat = bonus.get("atk", 0)
-        dex_flat = bonus.get("dex", 0)
-        # Terapkan base ATK dulu
-        player["atk"] += base_atk
-        # Terapkan bonus percent
-        player["atk"] = int(player["atk"] * (1 + atk_p / 100))
-        player["dex"] = int(player["dex"] * (1 + dex_p / 100))
-        # Terapkan bonus flat
-        player["atk"] += atk_flat
-        player["dex"] += dex_flat
-        # Simpan bonus untuk unequip selanjutnya
-        player["weapon_bonus"] = {
-            "base_atk": base_atk,
-            "atk_flat": atk_flat,
-            "dex_flat": dex_flat,
-        }
-
         player["weapon"] = item
-        slow(f"Kamu memakai senjata: {item}", 0.01)
+        hitung_stat_final(player)
+        slow(f"Kamu memasang weapon: {item}", 0.01)
         return
-    # ③ ITEM ARMOR
+    # Armor
     elif item in ARMORS:
-        a = ARMORS[item]
-        # Lepas armor lama
-        old = player.get("armor_bonus", {})
-        player["def"] -= old.get("base_def", 0)
-        player["def"] -= old.get("def_flat", 0)
-        player["dex"] -= old.get("dex_flat", 0)
-        # Pasang armor baru
-        base_def = a.get("def", 0)
-        bonus = a.get("bonus", {})
-
-        def_p = bonus.get("def_percent", 0)
-        dex_p = bonus.get("dex_percent", 0)
-
-        def_flat = bonus.get("def", 0)
-        dex_flat = bonus.get("dex", 0)
-        # Terapkan base DEF
-        player["def"] += base_def
-        # Bonus percent
-        player["def"] = int(player["def"] * (1 + def_p / 100))
-        player["dex"] = int(player["dex"] * (1 + dex_p / 100))
-        # Bonus flat
-        player["def"] += def_flat
-        player["dex"] += dex_flat
-        # Simpan untuk unequip
-        player["armor_bonus"] = {
-            "base_def": base_def,
-            "def_flat": def_flat,
-            "dex_flat": dex_flat,
-        }
-
         player["armor"] = item
+        hitung_stat_final(player)
         slow(f"Kamu memakai armor: {item}", 0.01)
         return
-    # ④ SELAIN ITU = TIDAK BISA DIPAKAI
     else:
-        slow("Item ini tidak bisa digunakan langsung.", 0.01)
+        slow("Item ini tidak bisa digunakan.", 0.01)
         return
 
 def buang_item(player):
