@@ -1587,17 +1587,12 @@ def battle_zombie(player, lokasi, reward_exp):
         action = input("Pilih aksi: ").strip()
         #  1. SERANG
         if action == "1":
-            hitung_stat_final(player)  # update lagi jika habis pakai item
-            # FINAL ATTACK PLAYER
+            hitung_stat_final(player)
             player_atk = player.get("atk_final", 10)
-            # cek senjata
             weapon_name = player.get("weapon", "Tangan Kosong")
             weapon_data = WEAPONS.get(weapon_name, {})
-            # bonus percent dari senjata sudah dihitung di atk_final → tidak perlu diulang
-            base_weapon_atk = weapon_data.get("atk", 5)
-            # damage dasar
             damage = int(player_atk)
-            # tipe gun perlu peluru
+            # Jika senjata tipe gun
             if weapon_data.get("type") == "gun":
                 ammo = weapon_data.get("ammo")
                 if player["inventory"].get(ammo, 0) <= 0:
@@ -1606,20 +1601,20 @@ def battle_zombie(player, lokasi, reward_exp):
                 else:
                     player["inventory"][ammo] -= 1
                     slow(f"🔫 {weapon_name} digunakan, tersisa {player['inventory'].get(ammo,0)} peluru", 0.02)
-                # DEF zombie dikurangkan
-                dmg_after_def = max(1, damage - int(zombie["def"]))
-                zombie["hp"] -= dmg_after_def
-                slow(f"Kamu menyerang dan memberi {dmg_after_def} damage!", 0.02)
-            # DODGE zombie (1 DEX = 0.3%)
-            player_dodge = player.get("dex_final", 0) * 0.3
-            if player_dodge > 60:
-                player_dodge = 60
+            # Hitung damage ke zombie
+            dmg_after_def = max(1, damage - int(zombie["def"]))
+            zombie["hp"] -= dmg_after_def
+            slow(f"Kamu menyerang dan memberi {dmg_after_def} damage!", 0.02)
+            # 2. GILIRAN ZOMBIE MENYERANG
+            # DODGE BARU (1 DEX = 0.2%)
+            player_dodge = player.get("dex_final", 0) * 0.2
+            if player_dodge > 70:
+                player_dodge = 70
             if random.random() < (player_dodge / 100.0):
                 slow("Kamu berhasil menghindari serangan!", 0.02)
-            else:
-                zombie_atk = int(zombie["atk"])
-                def_points = player.get("def_final", 0)
-            # tiap DEF mengurangi 1.5% serangan
+                return
+            zombie_atk = int(zombie["atk"])
+            def_points = player.get("def_final", 0)
             reduction = zombie_atk * (def_points * 0.015)
             final_dmg = max(1, int(zombie_atk - reduction))
             player["hp"] -= final_dmg
