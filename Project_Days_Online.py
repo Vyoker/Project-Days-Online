@@ -767,8 +767,8 @@ def check_level_up(player):
         player['atk'] += 1
         player['def'] += 1
         player['dex'] += 1
-        player['max_hp'] += 2
-        player['max_energy'] += 1
+        player['max_hp'] += 5
+        player['max_energy'] += 2
         player['hp'] = player['max_hp']
         player['energy'] = player['max_energy']
 
@@ -1606,14 +1606,24 @@ def battle_zombie(player, lokasi, reward_exp):
                 else:
                     player["inventory"][ammo] -= 1
                     slow(f"🔫 {weapon_name} digunakan, tersisa {player['inventory'].get(ammo,0)} peluru", 0.02)
-            # DODGE zombie
-            if random.randint(1, 100) <= zombie["dodge"]:
-                slow(f"{zombie['name']} berhasil menghindar!", 0.02)
-            else:
                 # DEF zombie dikurangkan
                 dmg_after_def = max(1, damage - int(zombie["def"]))
                 zombie["hp"] -= dmg_after_def
                 slow(f"Kamu menyerang dan memberi {dmg_after_def} damage!", 0.02)
+            # DODGE zombie (1 DEX = 0.3%)
+            player_dodge = player.get("dex_final", 0) * 0.3
+            if player_dodge > 60:
+                player_dodge = 60
+            if random.random() < (player_dodge / 100.0):
+                slow("Kamu berhasil menghindari serangan!", 0.02)
+            else:
+                zombie_atk = int(zombie["atk"])
+                def_points = player.get("def_final", 0)
+            # tiap DEF mengurangi 1.5% serangan
+            reduction = zombie_atk * (def_points * 0.015)
+            final_dmg = max(1, int(zombie_atk - reduction))
+            player["hp"] -= final_dmg
+            slow(f"{zombie['name']} menyerangmu dan memberi {final_dmg} damage!", 0.02)
         #  2. GUNAKAN ITEM
         elif action == "2":
             gunakan_item(player)
