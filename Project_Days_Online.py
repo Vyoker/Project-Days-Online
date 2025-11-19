@@ -131,7 +131,7 @@ def load_token_file():
     return None
 
 GITHUB_TOKEN = load_token_file()
-ONLINE_MODE = False
+ONLINE_MODE = True if GITHUB_TOKEN else False
 
 def _get_file_and_sha(path, timeout=8):
     url = f"{API_BASE}/{path}"
