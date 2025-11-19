@@ -1,4 +1,4 @@
-# Project_Days_Online v2.6.7
+# Project_Days_Online v2.6.8
 import os, sys, time, random, json, base64, uuid, requests
 from rich.console import Console
 from rich.panel import Panel
@@ -750,17 +750,28 @@ def create_new_game():
     return player
 
 def check_level_up(player):
+    # Jika sudah mencapai level maksimum → hentikan leveling
+    if player.get('level', 1) >= 100:
+        player['level'] = 100
+        return
     while player.get('exp', 0) >= player.get('exp_to_next', 100):
+        # Cek lagi di dalam loop
+        if player['level'] >= 100:
+            player['level'] = 100
+            player['exp'] = 0
+            return
+        # Naik level normal
         player['exp'] -= player['exp_to_next']
         player['level'] += 1
         player['exp_to_next'] = int(player.get('exp_to_next',100) * 1.5)
-        player['atk'] += 2
+        player['atk'] += 1
         player['def'] += 1
         player['dex'] += 1
-        player['max_hp'] += 10
-        player['max_energy'] += 5
+        player['max_hp'] += 2
+        player['max_energy'] += 1
         player['hp'] = player['max_hp']
         player['energy'] = player['max_energy']
+
         slow(f"\n🎉 Naik level! Sekarang kamu level {player['level']}", 0.02)
         time.sleep(0.8)
 # -----------
@@ -1557,6 +1568,14 @@ def battle_zombie(player, lokasi, reward_exp):
         "dodge": ztype.get("dodge", 0),
         "exp": reward_exp + random.randint(5, 15)
     }
+    # ===== SCALING MONSTER 2% PER LEVEL (CAP LEVEL 100) =====
+    player_level = min(player.get("level", 1), 100)   # level max 100
+    scaling = 1 + (player_level - 1) * 0.02           # 2% per level
+    # Terapkan scaling
+    zombie["hp"]  = int(zombie["hp"]  * scaling)
+    zombie["atk"] = int(zombie["atk"] * scaling)
+    zombie["def"] = int(zombie["def"] * scaling)
+    # dodge tidak perlu discaling, tetap dari JSON
     slow(f"Kamu bertemu dengan {zombie['name']}!", 0.02)
     slow(f"• HP: {int(zombie['hp'])} | ATK: {int(zombie['atk'])} | DEF: {int(zombie['def'])} | DODGE: {zombie['dodge']}%\n", 0.01)
     time.sleep(0.6)
