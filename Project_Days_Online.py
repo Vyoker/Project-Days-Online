@@ -57,6 +57,17 @@ def load_json(filename, default=None):
     except:
         # Jika error baca → return default kosong
         return default if default is not None else {}
+        
+def save_json(filename, data):
+    """Simpan data JSON ke folder data/ dengan aman."""
+    path = os.path.join(DATA_PATH, filename)
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        return True
+    except Exception as e:
+        print(f"[ERROR] Gagal save {filename}: {e}")
+        return False
 
 ARMORS = load_json("armors.json", {})
 CITIES = load_json("cities.json", {})
