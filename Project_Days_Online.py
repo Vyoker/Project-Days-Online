@@ -1615,8 +1615,12 @@ def battle_zombie(player, lokasi, reward_exp):
                 return
             zombie_atk = int(zombie["atk"])
             def_points = player.get("def_final", 0)
-            reduction = zombie_atk * (def_points * 0.015)
-            final_dmg = max(1, int(zombie_atk - reduction))
+            # (1 DEF = 0.3% reduce, max 70%)
+            damage_reduce_pct = def_points * 0.3   # 0.3% per DEF
+            if damage_reduce_pct > 70:
+                damage_reduce_pct = 70             # cap max 70%
+            reduction_amount = zombie_atk * (damage_reduce_pct / 100)
+            final_dmg = max(1, int(zombie_atk - reduction_amount))
             player["hp"] -= final_dmg
             slow(f"{zombie['name']} menyerangmu dan memberi {final_dmg} damage!", 0.02)
         #  2. GUNAKAN ITEM
