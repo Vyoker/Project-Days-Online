@@ -24,6 +24,7 @@ from world.explore import explore_menu
 from core.data_store import WEAPONS, MONSTERS, ARMORS
 from core.data_store import ITEMS, CRAFTING
 from core.data_store import SHOP, CITIES
+from core.io_json import load_json, save_json
 
 console = Console()
 # ---------------------------
@@ -39,28 +40,6 @@ TOKEN_FILE = "gh_token.txt"
 
 os.makedirs(SAVE_FOLDER, exist_ok=True)
 os.makedirs(DATA_PATH, exist_ok=True)
-
-def slow(text, delay=0.01):
-    for c in str(text):
-        sys.stdout.write(c)
-        sys.stdout.flush()
-        time.sleep(delay)
-    print()
-
-def clear():
-    os.system("clear" if os.name != "nt" else "cls")
-    header = Text(" ☣ PROJECT DAYS — APOCALYPSE ☣ ", style=f"bold {HIGHLIGHT} on {HEADER_BG}")
-    console.print(Panel(header, box=box.DOUBLE, style=HEADER_BG))
-
-def loading_animation(message="Loading", duration=1.2, speed=0.25):
-    end = time.time() + duration
-    i = 0
-    while time.time() < end:
-        dots = "." * ((i % 3) + 1)
-        
-        console.print(Panel(f"[{HIGHLIGHT}]{message}[/]{dots}", style=ACCENT, box=box.ROUNDED))
-        time.sleep(speed)
-        i += 1
 
 def hitung_stat_final(player):
     base_atk = player.get("base_atk", player.get("atk", 10))
