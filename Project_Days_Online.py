@@ -6,6 +6,13 @@ from rich.text import Text
 from rich import box
 from rich.table import Table
 from rich.align import Align
+from player.profile import (
+    save_game,
+    load_game_interactive,
+    create_new_game,
+    check_level_up,
+    ensure_player_quests
+)
 
 console = Console()
 # ---------------------------
