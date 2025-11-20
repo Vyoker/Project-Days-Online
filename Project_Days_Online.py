@@ -6,6 +6,11 @@ from rich.text import Text
 from rich import box
 from rich.table import Table
 from rich.align import Align
+from world.explore import explore_menu
+from core.data_store import WEAPONS, MONSTERS, ARMORS
+from core.data_store import ITEMS, CRAFTING
+from core.data_store import SHOP, CITIES
+from core.io_json import load_json, save_json
 from player.profile import (
     save_game,
     load_game_interactive,
@@ -20,26 +25,11 @@ from player.inventory import (
     buang_item,
     crafting_menu
 )
-from world.explore import explore_menu
-from core.data_store import WEAPONS, MONSTERS, ARMORS
-from core.data_store import ITEMS, CRAFTING
-from core.data_store import SHOP, CITIES
-from core.io_json import load_json, save_json
-
-console = Console()
-# ---------------------------
-# UI / Colors / Folders
-# ---------------------------
-HEADER_BG = "grey11 on rgb(85,52,36)"
-HIGHLIGHT = "rgb(210,180,140)"
-ACCENT = "rgb(182,121,82)"
-DATA_PATH = "data"
-SAVE_FOLDER = "saves"
-ADMIN_FILE = "admin.txt"
-TOKEN_FILE = "gh_token.txt"
-
-os.makedirs(SAVE_FOLDER, exist_ok=True)
-os.makedirs(DATA_PATH, exist_ok=True)
+from core.constants import (
+    console, HEADER_BG, HIGHLIGHT, ACCENT,
+    DATA_PATH, SAVE_FOLDER, ADMIN_FILE, TOKEN_FILE,
+    MAX_CHAT_SIZE_KB
+)
 
 def hitung_stat_final(player):
     base_atk = player.get("base_atk", player.get("atk", 10))
