@@ -2,6 +2,7 @@
 import random, time
 from core.utils import slow
 from core.data_store import DROP
+from core.utils import slow, clear, loading_animation
 
 def drop_item(player, monster_name="default"):
     data = DROP
