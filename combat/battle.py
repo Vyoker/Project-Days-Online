@@ -2,17 +2,17 @@ import random, time
 from core.utils import slow, loading_animation, hitung_stat_final
 from core.data_store import WEAPONS, MONSTERS, ARMORS
 from combat.drop import drop_item
+from player.inventory import gunakan_item
+from player.profile import check_level_up
 
 def battle_zombie(player, lokasi, reward_exp):
     # Pastikan stat final sudah dihitung
     hitung_stat_final(player, WEAPONS=WEAPONS, ARMORS=ARMORS)
 
     loading_animation(f"☣ Zombie mendekat di {lokasi}")
-
     # Pilih monster random dari monsters.json
     zname = random.choice(list(MONSTERS.keys()))
     ztype = MONSTERS.get(zname, {})
-
     zombie = {
         "name": zname,
         "hp": random.randint(40, 80) * ztype.get("hp_mod", 1.0),
@@ -21,7 +21,6 @@ def battle_zombie(player, lokasi, reward_exp):
         "dodge": ztype.get("dodge", 0),
         "exp": reward_exp + random.randint(5, 15)
     }
-
     # ===== SCALING MONSTER 2% PER LEVEL =====
     player_level = min(player.get("level", 1), 100)
     scaling = 1 + (player_level - 1) * 0.02
@@ -37,7 +36,6 @@ def battle_zombie(player, lokasi, reward_exp):
         0.01
     )
     time.sleep(0.6)
-
     # ===== LOOP PERTEMPURAN =====
     while player["hp"] > 0 and zombie["hp"] > 0:
         print(f"\n⚔️  {zombie['name']} — ❤️  {int(zombie['hp'])}")
@@ -45,10 +43,7 @@ def battle_zombie(player, lokasi, reward_exp):
         print("1. Serang\n2. Gunakan Item\n3. Kabur\n")
 
         action = input("Pilih aksi: ").strip()
-
-        # ===================================
         # 1. SERANG
-        # ===================================
         if action == "1":
             hitung_stat_final(player, WEAPONS=WEAPONS, ARMORS=ARMORS)
 
@@ -57,7 +52,6 @@ def battle_zombie(player, lokasi, reward_exp):
             weapon_data = WEAPONS.get(weapon_name, {})
 
             damage = int(player_atk)
-
             # Senjata tipe GUN membutuhkan peluru
             if weapon_data.get("type") == "gun":
                 ammo = weapon_data.get("ammo")
@@ -75,7 +69,6 @@ def battle_zombie(player, lokasi, reward_exp):
             dmg_after_def = max(1, damage - int(zombie["def"]))
             zombie["hp"] -= dmg_after_def
             slow(f"Kamu menyerang dan memberi {dmg_after_def} damage!", 0.02)
-
             # Jika zombie belum mati → zombie menyerang
             if zombie["hp"] > 0:
                 # ===== Dodge Player =====
@@ -102,33 +95,22 @@ def battle_zombie(player, lokasi, reward_exp):
                         f"{zombie['name']} menyerangmu dan memberi {final_dmg} damage!",
                         0.02,
                     )
-
-        # ===================================
         # 2. GUNAKAN ITEM
-        # ===================================
         elif action == "2":
-            from player.inventory import gunakan_item
             gunakan_item(player)
             hitung_stat_final(player, WEAPONS=WEAPONS, ARMORS=ARMORS)
             continue
-
-        # ===================================
         # 3. KABUR
-        # ===================================
         elif action == "3":
             if random.random() < 0.5:
                 slow("Kamu berhasil kabur!", 0.02)
                 return
             else:
                 slow("Gagal kabur!", 0.02)
-
         else:
             slow("Pilihan tidak valid.", 0.02)
             continue
-
-        # ===================================
         # HASIL
-        # ===================================
         if zombie["hp"] <= 0:
             slow(f"\n{zombie['name']} dikalahkan!", 0.03)
             gained_exp = int(zombie["exp"])
@@ -137,7 +119,6 @@ def battle_zombie(player, lokasi, reward_exp):
 
             drop_item(player, zname)
 
-            from player.profile import check_level_up
             check_level_up(player)
 
             time.sleep(0.6)
