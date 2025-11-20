@@ -1,4 +1,4 @@
-import random, time
+import random, time, sys
 from core.utils import slow, loading_animation, hitung_stat_final
 from core.data_store import WEAPONS, MONSTERS, ARMORS
 from combat.drop import drop_item
@@ -127,5 +127,4 @@ def battle_zombie(player, lokasi, reward_exp):
         if player["hp"] <= 0:
             slow("\nKamu tumbang... Game Over!\n", 0.03)
             time.sleep(2)
-            import sys
             sys.exit()
