@@ -55,7 +55,7 @@
   },
   "Handmade Knife Glacier": {
     "type": "melee",
-    "atk": 50,
+    "atk": 40,
     "bonus": {
       "atk_percent": 50,
       "def_percent": 0,
@@ -64,49 +64,49 @@
   },
   "Sword of Glacier": {
     "type": "melee",
-    "atk": 60,
+    "atk": 50,
     "bonus": {
-      "atk_percent": 60,
+      "atk_percent": 50,
       "def_percent": 0,
-      "dex_percent": 60
+      "dex_percent": 50
     }
   },
   "Pistol": {
     "type": "gun",
-    "atk": 35,
+    "atk": 25,
     "ammo": "Ammo 9mm",
-    "bonus": {
-      "atk_percent": 2,
-      "def_percent": 0,
-      "dex_percent": 2
-    }
-  },
-  "Shotgun": {
-    "type": "gun",
-    "atk": 55,
-    "ammo": "Ammo 12mm",
-    "bonus": {
-      "atk_percent": 8,
-      "def_percent": 0,
-      "dex_percent": 2
-    }
-  },
-  "Sniper": {
-    "type": "gun",
-    "atk": 95,
-    "ammo": "Ammo 7.2mm",
     "bonus": {
       "atk_percent": 10,
       "def_percent": 0,
       "dex_percent": 5
     }
   },
-  "Senapan Serbu": {
+  "Shotgun": {
     "type": "gun",
-    "atk": 60,
+    "atk": 35,
+    "ammo": "Ammo 12mm",
+    "bonus": {
+      "atk_percent": 15,
+      "def_percent": 0,
+      "dex_percent": 5
+    }
+  },
+  "Sniper": {
+    "type": "gun",
+    "atk": 55,
     "ammo": "Ammo 7.2mm",
     "bonus": {
-      "atk_percent": 10,
+      "atk_percent": 25,
+      "def_percent": 0,
+      "dex_percent": 5
+    }
+  },
+  "Senapan Serbu": {
+    "type": "gun",
+    "atk": 45,
+    "ammo": "Ammo 7.2mm",
+    "bonus": {
+      "atk_percent": 20,
       "def_percent": 0,
       "dex_percent": 2
     }
