@@ -1,19 +1,19 @@
 {
   "Perban": {
     "type": "heal",
-    "heal": 25
+    "heal": 35
   },
   "Herbal": {
     "type": "heal",
-    "heal": 15
+    "heal": 25
   },
   "Painkiller": {
     "type": "heal",
-    "heal": 35
+    "heal": 45
   },
   "Medkit": {
     "type": "heal",
-    "heal": 50
+    "heal": 75
   },
   "Makanan": {
     "type": "food",
@@ -23,11 +23,11 @@
   "Bolu": {
     "type": "food",
     "hp": 25,
-    "energy": 30
+    "energy": 40
   },
   "Minuman": {
     "type": "drink",
-    "energy": 20
+    "energy": 25
   },
   "Kayu": {
     "type": "material"
