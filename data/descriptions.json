@@ -2,22 +2,22 @@
   "items": {
     "Perban": {
       "desc": "Kain steril untuk menghentikan pendarahan ringan di dunia yang penuh luka.",
-      "hp": 25,
+      "hp": 35,
       "energy": 0
     },
     "Herbal": {
       "desc": "Ramuan alami hasil racikan dari tumbuhan liar, menenangkan rasa sakit ringan.",
-      "hp": 15,
+      "hp": 25,
       "energy": 5
     },
     "Painkiller": {
       "desc": "Obat pereda nyeri dosis tinggi. Mengembalikan HP namun menguras sedikit tenaga.",
-      "hp": 35,
+      "hp": 45,
       "energy": -5
     },
     "Medkit": {
       "desc": "Kotak medis lengkap. Ditemukan di reruntuhan rumah sakit tua.",
-      "hp": 50,
+      "hp": 75,
       "energy": 0
     },
     "Makanan": {
@@ -28,12 +28,12 @@
     "Bolu": {
       "desc": "Bolu ulang tahun. Menambah HP dan energy.",
       "hp": 25,
-      "energy": 30
+      "energy": 40
     },
     "Minuman": {
       "desc": "Air bersih dalam botol berdebu, sangat berharga di dunia yang kering.",
       "hp": 0,
-      "energy": 20
+      "energy": 25
     },
     "Kayu": {
       "desc": "Potongan kayu dari pohon lapuk, digunakan untuk membuat alat sederhana.",
