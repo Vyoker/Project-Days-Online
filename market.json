@@ -16,5 +16,14 @@
     "want_qty": 1,
     "time": "07:09:30",
     "loc": "Hutan Pinggiran"
+  },
+  {
+    "seller": "Vyoker",
+    "offer": "Pisau",
+    "offer_qty": 1,
+    "want": "Daun",
+    "want_qty": 10,
+    "time": "10:12:23",
+    "loc": "Makassar"
   }
 ]
